@@ -2,13 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
 namespace OpenPerch.App.Tests.EditMode
 {
-    /// <summary>Checks the assembly reference rules on the asmdef files of the app and of the packages.</summary>
+    /// <summary>
+    /// Checks the assembly reference rules on the asmdef files of the app and of the packages, and on the assemblies the
+    /// editor compiled from them.
+    /// </summary>
+    /// <remarks>
+    /// The asmdef files alone miss references the editor adds by itself: it compiles every assembly against UnityEditor,
+    /// so code under <c>#if UNITY_EDITOR</c> in a player assembly still builds, and an asmdef that does not override
+    /// references gets every auto-referenced precompiled DLL. The compiler keeps only the references the code uses, so
+    /// the compiled assemblies show those as well.
+    /// </remarks>
     public class AssemblyIsolationTests
     {
         private const string RuntimeAssembly = "OpenPerch.Runtime";
@@ -169,6 +179,103 @@ namespace OpenPerch.App.Tests.EditMode
 
             Assert.That(problems, Is.Empty,
                 "These assemblies must not reach UnityEngine, directly or through other assemblies:\n" + string.Join("\n", problems));
+        }
+
+        [Test]
+        [Category("T-ISO")]
+        public void CompiledRuntimeReferencesOnlyBaseLibrariesAndUnityEngine()
+        {
+            var compiled = CompiledAssemblies();
+            Assert.That(compiled.ContainsKey(RuntimeAssembly), Is.True, RuntimeAssembly + " is not loaded in the editor.");
+
+            var problems = ReferencedNames(compiled[RuntimeAssembly])
+                .Where(name => !IsBaseLibrary(name) && !IsNameOrDottedChild(name, "UnityEngine"))
+                .ToList();
+
+            Assert.That(problems, Is.Empty,
+                RuntimeAssembly + " was compiled against more than the base libraries and UnityEngine:\n" + string.Join("\n", problems));
+        }
+
+        [Test]
+        [Category("T-ISO")]
+        public void CompiledAppAssembliesReferenceNeitherUnityEditorInThePlayerNorTheVrchatSdk()
+        {
+            var compiled = CompiledAssemblies();
+            var apps = compiled.Keys.Where(name => name.StartsWith(AppPrefix, StringComparison.Ordinal)).ToList();
+            Assert.That(apps.Where(name => !EditorAppAssemblies.Contains(name)), Is.Not.Empty,
+                "No player " + AppPrefix + "* assembly is loaded.");
+
+            var problems = new List<string>();
+            foreach (var app in apps)
+            {
+                foreach (var name in ReferencedNames(compiled[app]))
+                {
+                    if (IsVrchatSdk(name))
+                    {
+                        problems.Add(app + " -> " + name);
+                    }
+                    else if (!EditorAppAssemblies.Contains(app) && name.StartsWith("UnityEditor", StringComparison.Ordinal))
+                    {
+                        problems.Add(app + " -> " + name);
+                    }
+                }
+            }
+
+            Assert.That(problems, Is.Empty,
+                "App assemblies were compiled against the VRChat SDK, or against UnityEditor although they ship in the player:\n" +
+                string.Join("\n", problems));
+        }
+
+        [Test]
+        [Category("T-ISO")]
+        public void CompiledEngineFreeAssembliesReferenceNoUnityAssembly()
+        {
+            var compiled = CompiledAssemblies();
+            var loaded = EngineFreeAssemblies.Where(compiled.ContainsKey).ToList();
+            Assert.That(loaded, Is.Not.Empty, "None of the engine-free assemblies is loaded in the editor.");
+
+            var problems = loaded
+                .SelectMany(engineFree => ReferencedNames(compiled[engineFree])
+                    .Where(name => name.StartsWith("Unity", StringComparison.Ordinal))
+                    .Select(name => engineFree + " -> " + name))
+                .ToList();
+
+            Assert.That(problems, Is.Empty,
+                "These assemblies were compiled against a Unity assembly:\n" + string.Join("\n", problems));
+        }
+
+        /// <summary>
+        /// The assemblies loaded in the editor, by name. An asmdef whose folder holds no script compiles to nothing, so its
+        /// assembly is absent.
+        /// </summary>
+        private static Dictionary<string, Assembly> CompiledAssemblies()
+        {
+            var compiled = new Dictionary<string, Assembly>(StringComparer.Ordinal);
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic))
+            {
+                var name = assembly.GetName().Name;
+                if (!compiled.ContainsKey(name))
+                {
+                    compiled.Add(name, assembly);
+                }
+            }
+
+            return compiled;
+        }
+
+        private static IEnumerable<string> ReferencedNames(Assembly assembly)
+        {
+            return assembly.GetReferencedAssemblies().Select(r => r.Name).OrderBy(n => n, StringComparer.Ordinal);
+        }
+
+        private static bool IsBaseLibrary(string name)
+        {
+            return name == "mscorlib" || name == "netstandard" || IsNameOrDottedChild(name, "System");
+        }
+
+        private static bool IsNameOrDottedChild(string name, string root)
+        {
+            return name == root || name.StartsWith(root + ".", StringComparison.Ordinal);
         }
 
         /// <summary>Every asmdef of the app project and of the packages in this repository, by assembly name.</summary>
