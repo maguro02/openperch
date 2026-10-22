@@ -27,8 +27,8 @@ namespace OpenPerch.Native.Smoke
 
                 error = ZoneIdentifier.ReadStream(unmarked, out content);
                 report.Require(
-                    error == Kernel32.ERROR_FILE_NOT_FOUND && content.Length == 0,
-                    $"a file without the stream reports ERROR_FILE_NOT_FOUND (error {error})");
+                    error == Kernel32.ERROR_FILE_NOT_FOUND && content.Length == 0 && ZoneIdentifier.MeansUnmarked(error),
+                    $"a file without the stream reports ERROR_FILE_NOT_FOUND, which counts as unmarked (error {error})");
             }
             finally
             {

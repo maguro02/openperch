@@ -46,14 +46,15 @@ namespace OpenPerch.Native.Smoke
             }
         }
 
-        public static void TokenElevation(SmokeReport report)
+        /// <returns>Whether this process runs elevated; false when its token cannot be read.</returns>
+        public static bool TokenElevation(SmokeReport report)
         {
             bool opened = Advapi32.OpenProcessToken(Kernel32.GetCurrentProcess(), Advapi32.TOKEN_QUERY, out IntPtr token);
             int error = Marshal.GetLastWin32Error();
             report.Require(opened, $"OpenProcessToken opens this process's token (error {error})");
             if (!opened)
             {
-                return;
+                return false;
             }
 
             try
@@ -62,7 +63,9 @@ namespace OpenPerch.Native.Smoke
                 bool read = Advapi32.GetTokenInformation(token, Advapi32.TokenElevation, out TOKEN_ELEVATION elevation, size, out uint written);
                 error = Marshal.GetLastWin32Error();
                 report.Require(read && written == size, $"GetTokenInformation(TokenElevation) fills TOKEN_ELEVATION (error {error}, {written} bytes)");
-                report.Info("elevated: " + (elevation.TokenIsElevated != 0));
+                bool elevated = read && elevation.TokenIsElevated != 0;
+                report.Info("elevated: " + elevated);
+                return elevated;
             }
             finally
             {

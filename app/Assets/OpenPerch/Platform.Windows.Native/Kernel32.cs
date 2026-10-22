@@ -16,6 +16,10 @@ namespace OpenPerch.App.Platform.Windows.Native
         public const int ERROR_FILE_NOT_FOUND = 2;
         public const int ERROR_PATH_NOT_FOUND = 3;
         public const int ERROR_ACCESS_DENIED = 5;
+
+        /// <summary>Also what opening a named stream reports on a volume that cannot hold one, such as FAT32 or exFAT.</summary>
+        public const int ERROR_INVALID_NAME = 123;
+
         public const int ERROR_ALREADY_EXISTS = 183;
 
         public static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);

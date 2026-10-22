@@ -98,5 +98,15 @@ namespace OpenPerch.Core.Tests.Native
         {
             Assert.That(ZoneIdentifier.TryParseZoneId(null, out _), Is.False);
         }
+
+        [TestCase(Kernel32.ERROR_FILE_NOT_FOUND, true)]
+        [TestCase(Kernel32.ERROR_INVALID_NAME, true)]
+        [TestCase(Kernel32.ERROR_SUCCESS, false)]
+        [TestCase(Kernel32.ERROR_PATH_NOT_FOUND, false)]
+        [TestCase(Kernel32.ERROR_ACCESS_DENIED, false)]
+        public void OnlyAMissingStreamOrAVolumeWithoutStreamsMeansUnmarked(int result, bool unmarked)
+        {
+            Assert.That(ZoneIdentifier.MeansUnmarked(result), Is.EqualTo(unmarked));
+        }
     }
 }

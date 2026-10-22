@@ -19,11 +19,13 @@ namespace OpenPerch.Native.Smoke
             report.Section("Declared entry points", () => DeclarationCheck.Run(report));
             report.Section("Per-monitor DPI awareness", () => ProcessChecks.PerMonitorDpiAwareness(report));
             report.Section("Single-instance mutex", () => ProcessChecks.SingleInstanceMutex(report));
-            report.Section("Token elevation", () => ProcessChecks.TokenElevation(report));
+            bool elevated = false;
+            report.Section("Token elevation", () => elevated = ProcessChecks.TokenElevation(report));
             report.Section("User notification state", () => ProcessChecks.NotificationState(report));
             report.Section("High-resolution wait timer", () => ProcessChecks.HighResolutionTimer(report));
             report.Section("Input state", () => ProcessChecks.InputState(report));
             report.Section("Zone.Identifier", () => ZoneIdentifierCheck.Run(report));
+            report.Section("Zone.Identifier on volumes without named streams", () => StreamlessVolumeCheck.Run(report, elevated));
             report.Section("Window enumeration", () => DesktopChecks.TopLevelWindows(report));
             report.Section("Shell windows", () => DesktopChecks.ShellWindows(report));
             report.Section("Monitor enumeration", () => DesktopChecks.DisplayMonitors(report));

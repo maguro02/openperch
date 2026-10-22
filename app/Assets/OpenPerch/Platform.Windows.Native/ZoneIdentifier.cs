@@ -14,7 +14,9 @@ namespace OpenPerch.App.Platform.Windows.Native
     {
         public const string StreamSuffix = ":Zone.Identifier";
 
-        /// <summary><c>URLZONE_INTERNET</c>. Files marked with this zone or a higher one came from outside the machine.</summary>
+        /// <summary>
+        /// <c>URLZONE_INTERNET</c>. Marks at this value or above are the Internet zone and the Restricted Sites zone.
+        /// </summary>
         public const int UrlZoneInternet = 3;
 
         /// <summary>
@@ -27,8 +29,8 @@ namespace OpenPerch.App.Platform.Windows.Native
         /// <summary>Reads the <c>Zone.Identifier</c> stream of <paramref name="filePath"/>.</summary>
         /// <returns>
         /// <see cref="Kernel32.ERROR_SUCCESS"/> with at most <see cref="MaxStreamBytes"/> bytes in <paramref name="content"/>,
-        /// or the Win32 error with an empty <paramref name="content"/>. <see cref="Kernel32.ERROR_FILE_NOT_FOUND"/> means the
-        /// file carries no mark.
+        /// or the Win32 error with an empty <paramref name="content"/>. <see cref="MeansUnmarked"/> separates the errors
+        /// that mean the file carries no mark from those that leave the mark unknown.
         /// </returns>
         public static int ReadStream(string filePath, out byte[] content)
         {
@@ -77,6 +79,14 @@ namespace OpenPerch.App.Platform.Windows.Native
                 Kernel32.CloseHandle(handle);
             }
         }
+
+        /// <summary>
+        /// True when a <see cref="ReadStream"/> result means the file carries no mark: it has no <c>Zone.Identifier</c>
+        /// stream (<see cref="Kernel32.ERROR_FILE_NOT_FOUND"/>), or it sits on a volume that cannot hold named streams,
+        /// such as FAT32 or exFAT (<see cref="Kernel32.ERROR_INVALID_NAME"/>).
+        /// </summary>
+        public static bool MeansUnmarked(int result) =>
+            result == Kernel32.ERROR_FILE_NOT_FOUND || result == Kernel32.ERROR_INVALID_NAME;
 
         /// <summary>
         /// Finds <c>ZoneId</c> in the <c>[ZoneTransfer]</c> section of a stream returned by <see cref="ReadStream"/>.
