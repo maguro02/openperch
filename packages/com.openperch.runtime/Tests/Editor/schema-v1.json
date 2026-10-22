@@ -1,0 +1,1493 @@
+{
+  "schemaVersion": 1,
+  "assembly": "OpenPerch.Runtime",
+  "types": [
+    {
+      "name": "OpenPerch.Runtime.AvatarDefinition",
+      "kind": "class",
+      "baseType": "UnityEngine.ScriptableObject",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "exportId",
+          "type": "System.String"
+        },
+        {
+          "name": "displayName",
+          "type": "System.String"
+        },
+        {
+          "name": "avatarPrefab",
+          "type": "UnityEngine.GameObject"
+        },
+        {
+          "name": "fxController",
+          "type": "UnityEngine.RuntimeAnimatorController"
+        },
+        {
+          "name": "parameters",
+          "type": "OpenPerch.Runtime.ExpressionParameterDef[]"
+        },
+        {
+          "name": "menuPages",
+          "type": "OpenPerch.Runtime.MenuPageDef[]"
+        },
+        {
+          "name": "eyes",
+          "type": "OpenPerch.Runtime.EyeSettings"
+        },
+        {
+          "name": "viewPositionLocal",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "avatarHeightMeters",
+          "type": "System.Single"
+        },
+        {
+          "name": "warmupVariants",
+          "type": "UnityEngine.ShaderVariantCollection"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.DriverEntry",
+      "kind": "class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": true,
+      "fields": [
+        {
+          "name": "type",
+          "type": "OpenPerch.Runtime.DriverOp"
+        },
+        {
+          "name": "name",
+          "type": "System.String"
+        },
+        {
+          "name": "source",
+          "type": "System.String"
+        },
+        {
+          "name": "value",
+          "type": "System.Single"
+        },
+        {
+          "name": "valueMin",
+          "type": "System.Single"
+        },
+        {
+          "name": "valueMax",
+          "type": "System.Single"
+        },
+        {
+          "name": "chance",
+          "type": "System.Single"
+        },
+        {
+          "name": "convertRange",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "sourceMin",
+          "type": "System.Single"
+        },
+        {
+          "name": "sourceMax",
+          "type": "System.Single"
+        },
+        {
+          "name": "destMin",
+          "type": "System.Single"
+        },
+        {
+          "name": "destMax",
+          "type": "System.Single"
+        },
+        {
+          "name": "preventRepeats",
+          "type": "System.Boolean"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.DriverOp",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Set",
+          "value": 0
+        },
+        {
+          "name": "Add",
+          "value": 1
+        },
+        {
+          "name": "Random",
+          "value": 2
+        },
+        {
+          "name": "Copy",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.ExprParamType",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Int",
+          "value": 0
+        },
+        {
+          "name": "Float",
+          "value": 1
+        },
+        {
+          "name": "Bool",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.ExpressionParameterDef",
+      "kind": "class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": true,
+      "fields": [
+        {
+          "name": "name",
+          "type": "System.String"
+        },
+        {
+          "name": "type",
+          "type": "OpenPerch.Runtime.ExprParamType"
+        },
+        {
+          "name": "defaultValue",
+          "type": "System.Single"
+        },
+        {
+          "name": "saved",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "synced",
+          "type": "System.Boolean"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.EyeSettings",
+      "kind": "class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": true,
+      "fields": [
+        {
+          "name": "enableEyeLook",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "leftEyePath",
+          "type": "System.String"
+        },
+        {
+          "name": "rightEyePath",
+          "type": "System.String"
+        },
+        {
+          "name": "straightL",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "straightR",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "upL",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "upR",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "downL",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "downR",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "leftL",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "leftR",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "rightL",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "rightR",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "eyelidType",
+          "type": "OpenPerch.Runtime.EyelidType"
+        },
+        {
+          "name": "eyelidMeshPath",
+          "type": "System.String"
+        },
+        {
+          "name": "blinkShape",
+          "type": "System.String"
+        },
+        {
+          "name": "lookUpShape",
+          "type": "System.String"
+        },
+        {
+          "name": "lookDownShape",
+          "type": "System.String"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.EyelidType",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "None",
+          "value": 0
+        },
+        {
+          "name": "Bones",
+          "value": 1
+        },
+        {
+          "name": "Blendshapes",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.IPerchSmbHandler",
+      "kind": "interface",
+      "baseType": "",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.MenuControlDef",
+      "kind": "class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": true,
+      "fields": [
+        {
+          "name": "name",
+          "type": "System.String"
+        },
+        {
+          "name": "icon",
+          "type": "UnityEngine.Texture2D"
+        },
+        {
+          "name": "type",
+          "type": "OpenPerch.Runtime.MenuControlType"
+        },
+        {
+          "name": "parameter",
+          "type": "System.String"
+        },
+        {
+          "name": "value",
+          "type": "System.Single"
+        },
+        {
+          "name": "subParameters",
+          "type": "System.String[]"
+        },
+        {
+          "name": "subMenuIndex",
+          "type": "System.Int32"
+        },
+        {
+          "name": "labelNames",
+          "type": "System.String[]"
+        },
+        {
+          "name": "labelIcons",
+          "type": "UnityEngine.Texture2D[]"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.MenuControlType",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Button",
+          "value": 0
+        },
+        {
+          "name": "Toggle",
+          "value": 1
+        },
+        {
+          "name": "SubMenu",
+          "value": 2
+        },
+        {
+          "name": "TwoAxisPuppet",
+          "value": 3
+        },
+        {
+          "name": "FourAxisPuppet",
+          "value": 4
+        },
+        {
+          "name": "RadialPuppet",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.MenuPageDef",
+      "kind": "class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": true,
+      "fields": [
+        {
+          "name": "name",
+          "type": "System.String"
+        },
+        {
+          "name": "controls",
+          "type": "OpenPerch.Runtime.MenuControlDef[]"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.MotionEntry",
+      "kind": "class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "System.String"
+        },
+        {
+          "name": "sourceName",
+          "type": "System.String"
+        },
+        {
+          "name": "role",
+          "type": "OpenPerch.Runtime.MotionRole"
+        },
+        {
+          "name": "clip",
+          "type": "UnityEngine.AnimationClip"
+        },
+        {
+          "name": "length",
+          "type": "System.Single"
+        },
+        {
+          "name": "loop",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "hasRootMotion",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "averageVelocity",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "weight",
+          "type": "System.Single"
+        },
+        {
+          "name": "walkSpeed",
+          "type": "System.Single"
+        },
+        {
+          "name": "seatHeight",
+          "type": "System.Single"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.MotionPack",
+      "kind": "class",
+      "baseType": "UnityEngine.ScriptableObject",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "exportId",
+          "type": "System.String"
+        },
+        {
+          "name": "displayName",
+          "type": "System.String"
+        },
+        {
+          "name": "motions",
+          "type": "OpenPerch.Runtime.MotionEntry[]"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.MotionRole",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Idle",
+          "value": 0
+        },
+        {
+          "name": "IdleVariant",
+          "value": 1
+        },
+        {
+          "name": "Walk",
+          "value": 2
+        },
+        {
+          "name": "SitOnEdge",
+          "value": 3
+        },
+        {
+          "name": "Dragged",
+          "value": 4
+        },
+        {
+          "name": "Fall",
+          "value": 5
+        },
+        {
+          "name": "Land",
+          "value": 6
+        },
+        {
+          "name": "SitOnFloor",
+          "value": 7
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PbAllow",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "False",
+          "value": 0
+        },
+        {
+          "name": "True",
+          "value": 1
+        },
+        {
+          "name": "Other",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PbColliderShape",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Sphere",
+          "value": 0
+        },
+        {
+          "name": "Capsule",
+          "value": 1
+        },
+        {
+          "name": "Plane",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PbImmobileType",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "AllMotion",
+          "value": 0
+        },
+        {
+          "name": "World",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PbIntegration",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Simplified",
+          "value": 0
+        },
+        {
+          "name": "Advanced",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PbLimitType",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "None",
+          "value": 0
+        },
+        {
+          "name": "Angle",
+          "value": 1
+        },
+        {
+          "name": "Hinge",
+          "value": 2
+        },
+        {
+          "name": "Polar",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PbMultiChild",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Ignore",
+          "value": 0
+        },
+        {
+          "name": "First",
+          "value": 1
+        },
+        {
+          "name": "Average",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PbVersion",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "V1_0",
+          "value": 0
+        },
+        {
+          "name": "V1_1",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchConstraint",
+      "kind": "class",
+      "baseType": "UnityEngine.MonoBehaviour",
+      "interfaces": [
+        "UnityEngine.ISerializationCallbackReceiver"
+      ],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "kind",
+          "type": "OpenPerch.Runtime.PerchConstraintKind"
+        },
+        {
+          "name": "isActive",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "globalWeight",
+          "type": "System.Single"
+        },
+        {
+          "name": "targetTransform",
+          "type": "UnityEngine.Transform"
+        },
+        {
+          "name": "solveInLocalSpace",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "freezeToWorld",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "locked",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsPositionX",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsPositionY",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsPositionZ",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsRotationX",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsRotationY",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsRotationZ",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsScaleX",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsScaleY",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "affectsScaleZ",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "positionAtRest",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "positionOffset",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "rotationAtRest",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "rotationOffset",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "scaleAtRest",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "scaleOffset",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "aimAxis",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "upAxis",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "worldUpVector",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "worldUpType",
+          "type": "System.Int32"
+        },
+        {
+          "name": "worldUpTransform",
+          "type": "UnityEngine.Transform"
+        },
+        {
+          "name": "roll",
+          "type": "System.Single"
+        },
+        {
+          "name": "useUpTransform",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "sourceCount",
+          "type": "System.Int32"
+        },
+        {
+          "name": "source0",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source1",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source2",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source3",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source4",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source5",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source6",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source7",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source8",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source9",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source10",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source11",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source12",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source13",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source14",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        },
+        {
+          "name": "source15",
+          "type": "OpenPerch.Runtime.PerchConstraintSource"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchConstraintKind",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Position",
+          "value": 0
+        },
+        {
+          "name": "Rotation",
+          "value": 1
+        },
+        {
+          "name": "Scale",
+          "value": 2
+        },
+        {
+          "name": "Parent",
+          "value": 3
+        },
+        {
+          "name": "Aim",
+          "value": 4
+        },
+        {
+          "name": "LookAt",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchConstraintSource",
+      "kind": "struct",
+      "baseType": "System.ValueType",
+      "interfaces": [],
+      "serializable": true,
+      "fields": [
+        {
+          "name": "source",
+          "type": "UnityEngine.Transform"
+        },
+        {
+          "name": "weight",
+          "type": "System.Single"
+        },
+        {
+          "name": "parentPositionOffset",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "parentRotationOffset",
+          "type": "UnityEngine.Vector3"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchContactData",
+      "kind": "class",
+      "baseType": "UnityEngine.MonoBehaviour",
+      "interfaces": [
+        "UnityEngine.ISerializationCallbackReceiver"
+      ],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "isReceiver",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "shape",
+          "type": "OpenPerch.Runtime.PerchContactShape"
+        },
+        {
+          "name": "rootTransform",
+          "type": "UnityEngine.Transform"
+        },
+        {
+          "name": "radius",
+          "type": "System.Single"
+        },
+        {
+          "name": "height",
+          "type": "System.Single"
+        },
+        {
+          "name": "position",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "size",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "rotation",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "collisionTags",
+          "type": "System.Collections.Generic.List<System.String>"
+        },
+        {
+          "name": "receiverType",
+          "type": "System.Int32"
+        },
+        {
+          "name": "parameter",
+          "type": "System.String"
+        },
+        {
+          "name": "allowSelf",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "allowOthers",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "localOnly",
+          "type": "System.Boolean"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchContactShape",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Sphere",
+          "value": 0
+        },
+        {
+          "name": "Capsule",
+          "value": 1
+        },
+        {
+          "name": "Box",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchLayerControl",
+      "kind": "class",
+      "baseType": "UnityEngine.StateMachineBehaviour",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "playable",
+          "type": "OpenPerch.Runtime.PlayableLayer"
+        },
+        {
+          "name": "layer",
+          "type": "System.Int32"
+        },
+        {
+          "name": "goalWeight",
+          "type": "System.Single"
+        },
+        {
+          "name": "blendDuration",
+          "type": "System.Single"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchLocomotionControl",
+      "kind": "class",
+      "baseType": "UnityEngine.StateMachineBehaviour",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "disableLocomotion",
+          "type": "System.Boolean"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchParameterDriver",
+      "kind": "class",
+      "baseType": "UnityEngine.StateMachineBehaviour",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "localOnly",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "parameters",
+          "type": "System.Collections.Generic.List<OpenPerch.Runtime.DriverEntry>"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchPhysBone",
+      "kind": "class",
+      "baseType": "UnityEngine.MonoBehaviour",
+      "interfaces": [
+        "UnityEngine.ISerializationCallbackReceiver"
+      ],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "version",
+          "type": "OpenPerch.Runtime.PbVersion"
+        },
+        {
+          "name": "integrationType",
+          "type": "OpenPerch.Runtime.PbIntegration"
+        },
+        {
+          "name": "rootTransform",
+          "type": "UnityEngine.Transform"
+        },
+        {
+          "name": "ignoreTransforms",
+          "type": "System.Collections.Generic.List<UnityEngine.Transform>"
+        },
+        {
+          "name": "ignoreOtherPhysBones",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "endpointPosition",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "multiChildType",
+          "type": "OpenPerch.Runtime.PbMultiChild"
+        },
+        {
+          "name": "pull",
+          "type": "System.Single"
+        },
+        {
+          "name": "pullCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "spring",
+          "type": "System.Single"
+        },
+        {
+          "name": "springCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "stiffness",
+          "type": "System.Single"
+        },
+        {
+          "name": "stiffnessCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "gravity",
+          "type": "System.Single"
+        },
+        {
+          "name": "gravityCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "gravityFalloff",
+          "type": "System.Single"
+        },
+        {
+          "name": "gravityFalloffCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "immobileType",
+          "type": "OpenPerch.Runtime.PbImmobileType"
+        },
+        {
+          "name": "immobile",
+          "type": "System.Single"
+        },
+        {
+          "name": "immobileCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "limitType",
+          "type": "OpenPerch.Runtime.PbLimitType"
+        },
+        {
+          "name": "maxAngleX",
+          "type": "System.Single"
+        },
+        {
+          "name": "maxAngleXCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "maxAngleZ",
+          "type": "System.Single"
+        },
+        {
+          "name": "maxAngleZCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "limitRotation",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "limitRotationXCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "limitRotationYCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "limitRotationZCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "radius",
+          "type": "System.Single"
+        },
+        {
+          "name": "radiusCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "allowCollision",
+          "type": "OpenPerch.Runtime.PbAllow"
+        },
+        {
+          "name": "collisionAllowSelf",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "collisionAllowOthers",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "colliders",
+          "type": "System.Collections.Generic.List<OpenPerch.Runtime.PerchPhysBoneCollider>"
+        },
+        {
+          "name": "stretchMotion",
+          "type": "System.Single"
+        },
+        {
+          "name": "stretchMotionCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "maxStretch",
+          "type": "System.Single"
+        },
+        {
+          "name": "maxStretchCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "maxSquish",
+          "type": "System.Single"
+        },
+        {
+          "name": "maxSquishCurve",
+          "type": "UnityEngine.AnimationCurve"
+        },
+        {
+          "name": "allowGrabbing",
+          "type": "OpenPerch.Runtime.PbAllow"
+        },
+        {
+          "name": "grabAllowSelf",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "grabAllowOthers",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "allowPosing",
+          "type": "OpenPerch.Runtime.PbAllow"
+        },
+        {
+          "name": "poseAllowSelf",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "poseAllowOthers",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "grabMovement",
+          "type": "System.Single"
+        },
+        {
+          "name": "snapToHand",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "parameter",
+          "type": "System.String"
+        },
+        {
+          "name": "isAnimated",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "resetWhenDisabled",
+          "type": "System.Boolean"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchPhysBoneCollider",
+      "kind": "class",
+      "baseType": "UnityEngine.MonoBehaviour",
+      "interfaces": [
+        "UnityEngine.ISerializationCallbackReceiver"
+      ],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "rootTransform",
+          "type": "UnityEngine.Transform"
+        },
+        {
+          "name": "shapeType",
+          "type": "OpenPerch.Runtime.PbColliderShape"
+        },
+        {
+          "name": "radius",
+          "type": "System.Single"
+        },
+        {
+          "name": "height",
+          "type": "System.Single"
+        },
+        {
+          "name": "position",
+          "type": "UnityEngine.Vector3"
+        },
+        {
+          "name": "rotation",
+          "type": "UnityEngine.Quaternion"
+        },
+        {
+          "name": "insideBounds",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "bonesAsSphere",
+          "type": "System.Boolean"
+        },
+        {
+          "name": "isGlobal",
+          "type": "System.Boolean"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchPlayableLayerControl",
+      "kind": "class",
+      "baseType": "UnityEngine.StateMachineBehaviour",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "layer",
+          "type": "OpenPerch.Runtime.PlayableLayer"
+        },
+        {
+          "name": "goalWeight",
+          "type": "System.Single"
+        },
+        {
+          "name": "blendDuration",
+          "type": "System.Single"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PerchTrackingControl",
+      "kind": "class",
+      "baseType": "UnityEngine.StateMachineBehaviour",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [
+        {
+          "name": "schemaVersion",
+          "type": "System.Int32"
+        },
+        {
+          "name": "eyes",
+          "type": "OpenPerch.Runtime.TrackingMode"
+        },
+        {
+          "name": "mouth",
+          "type": "OpenPerch.Runtime.TrackingMode"
+        }
+      ],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.PlayableLayer",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "Action",
+          "value": 0
+        },
+        {
+          "name": "FX",
+          "value": 1
+        },
+        {
+          "name": "Gesture",
+          "value": 2
+        },
+        {
+          "name": "Additive",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "OpenPerch.Runtime.RuntimeMigration",
+      "kind": "static class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.RuntimeSchema",
+      "kind": "static class",
+      "baseType": "System.Object",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": []
+    },
+    {
+      "name": "OpenPerch.Runtime.TrackingMode",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "interfaces": [],
+      "serializable": false,
+      "fields": [],
+      "enumValues": [
+        {
+          "name": "NoChange",
+          "value": 0
+        },
+        {
+          "name": "Tracking",
+          "value": 1
+        },
+        {
+          "name": "Animation",
+          "value": 2
+        }
+      ]
+    }
+  ]
+}
