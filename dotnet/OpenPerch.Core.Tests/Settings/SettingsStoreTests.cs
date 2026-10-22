@@ -205,7 +205,8 @@ namespace OpenPerch.Core.Tests.Settings
             store.SaveDebounced(new AppSettings { targetFpsCap = 30 });
             _time.Advance(1);
 
-            Assert.Throws<IOException>(() => store.Pump());
+            store.Pump();
+            Assert.That(store.LastWriteError, Is.InstanceOf<IOException>());
             _time.Advance(0.5);
             store.Pump();
             Assert.That(codec.SerializeCalls, Is.EqualTo(1));
@@ -213,6 +214,56 @@ namespace OpenPerch.Core.Tests.Settings
             _time.Advance(0.5);
             store.Pump();
             Assert.That(codec.SerializeCalls, Is.EqualTo(2));
+            Assert.That(store.LastWriteError, Is.Null);
+            Assert.That(NewStore().Load().targetFpsCap, Is.EqualTo(30));
+        }
+
+        [TestCase(typeof(IOException))]
+        [TestCase(typeof(UnauthorizedAccessException))]
+        public void FailedFlushDoesNotThrowAndKeepsTheChange(Type errorType)
+        {
+            var codec = new FailingCodec(_codec, 1, () => (Exception)Activator.CreateInstance(errorType));
+            var store = new SettingsStore(_dir.Root, codec, _time);
+            store.SaveDebounced(new AppSettings { targetFpsCap = 30 });
+
+            store.Flush();
+
+            Assert.That(store.LastWriteError, Is.InstanceOf(errorType));
+            Assert.That(File.Exists(SettingsPath), Is.False);
+
+            store.Flush();
+
+            Assert.That(store.LastWriteError, Is.Null);
+            Assert.That(NewStore().Load().targetFpsCap, Is.EqualTo(30));
+        }
+
+        [Test]
+        public void FailureOnDiskIsReportedWithoutThrowing()
+        {
+            // A folder where the file belongs makes the final rename fail, as a file locked by another process would.
+            Directory.CreateDirectory(SettingsPath);
+            var store = NewStore();
+            store.SaveDebounced(new AppSettings { targetFpsCap = 30 });
+
+            store.Flush();
+
+            Assert.That(store.LastWriteError, Is.Not.Null);
+            Directory.Delete(SettingsPath);
+            store.Flush();
+            Assert.That(store.LastWriteError, Is.Null);
+            Assert.That(NewStore().Load().targetFpsCap, Is.EqualTo(30));
+        }
+
+        [Test]
+        public void OtherErrorsPropagateAndKeepTheChange()
+        {
+            var codec = new FailingCodec(_codec, 1, () => new InvalidOperationException());
+            var store = new SettingsStore(_dir.Root, codec, _time);
+            store.SaveDebounced(new AppSettings { targetFpsCap = 30 });
+
+            Assert.Throws<InvalidOperationException>(() => store.Flush());
+
+            store.Flush();
             Assert.That(NewStore().Load().targetFpsCap, Is.EqualTo(30));
         }
 
@@ -251,6 +302,34 @@ namespace OpenPerch.Core.Tests.Settings
 
             Assert.That(File.ReadAllText(_dir.Combine(BackupName)), Is.EqualTo("first"));
             Assert.That(File.ReadAllText(_dir.Combine(BackupName + "-1")), Is.EqualTo("second"));
+        }
+
+        [Test]
+        public void CorruptFileThatCannotBeMovedIsLeftForTheNextSave()
+        {
+            File.WriteAllText(SettingsPath, "{");
+            // A folder holding the backup's name makes the move fail, as a file locked by another process would.
+            Directory.CreateDirectory(_dir.Combine(BackupName));
+            var store = NewStore();
+
+            var loaded = store.Load();
+
+            Assert.That(PersistComparer.Differences(new AppSettings(), loaded), Is.Empty);
+            Assert.That(File.ReadAllText(SettingsPath), Is.EqualTo("{"));
+
+            loaded.targetFpsCap = 30;
+            store.SaveDebounced(loaded);
+            store.Flush();
+            Assert.That(NewStore().Load().targetFpsCap, Is.EqualTo(30));
+        }
+
+        [Test]
+        public void UnreadableFileIsNotReplacedWithDefaults()
+        {
+            // A folder where the file belongs makes reading it fail with an access error.
+            Directory.CreateDirectory(SettingsPath);
+
+            Assert.Throws<UnauthorizedAccessException>(() => NewStore().Load());
         }
 
         [Test]

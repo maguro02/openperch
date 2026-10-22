@@ -22,16 +22,23 @@ namespace OpenPerch.App.Core
         }
 
         /// <summary>
-        /// True when the last <see cref="Load"/> could not parse <c>index.json</c>, moved it aside and returned an empty index.
-        /// The caller then rebuilds the entries from the packages in the library folder.
+        /// True when the last <see cref="Load"/> could not parse <c>index.json</c> and returned an empty index. The store does
+        /// not rebuild the entries itself: the caller reads the packages in the library folder again, adds their entries
+        /// with <see cref="LibraryEntry.crcVerified"/> false, and calls <see cref="Save"/>.
         /// </summary>
         public bool LastLoadWasCorrupt { get; private set; }
 
         /// <summary>
         /// Reads the index. A missing file yields an empty index. A file the codec cannot parse is moved to
-        /// <c>index.json.bak-&lt;UTC time&gt;</c>, <see cref="LastLoadWasCorrupt"/> is set and an empty index is returned.
-        /// Null collections and strings are replaced with their defaults.
+        /// <c>index.json.bak-&lt;UTC time&gt;</c>, or left in place for the next save to replace when it cannot be moved;
+        /// either way <see cref="LastLoadWasCorrupt"/> is set and an empty index is returned. Null collections and strings
+        /// are replaced with their defaults.
         /// </summary>
+        /// <exception cref="IOException">
+        /// The file exists but cannot be read, for example while another process holds it open without sharing. An empty
+        /// index is not returned in this case, because saving it later would overwrite an index that is intact.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">The file exists but reading it is denied; handled as above.</exception>
         public LibraryIndex Load()
         {
             LastLoadWasCorrupt = false;
@@ -57,7 +64,7 @@ namespace OpenPerch.App.Core
             }
             catch (FormatException)
             {
-                PersistedFile.MoveAside(_path, DateTime.UtcNow);
+                PersistedFile.TryMoveAside(_path, DateTime.UtcNow);
                 LastLoadWasCorrupt = true;
                 return new LibraryIndex();
             }

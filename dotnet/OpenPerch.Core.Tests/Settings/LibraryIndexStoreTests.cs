@@ -114,6 +114,34 @@ namespace OpenPerch.Core.Tests.Settings
         }
 
         [Test]
+        public void CorruptFileThatCannotBeMovedIsLeftForTheNextSave()
+        {
+            Directory.CreateDirectory(LibraryDir);
+            File.WriteAllText(IndexPath, "{\"entries\": [");
+            BlockBackupNames(DateTime.UtcNow, 10);
+            var store = NewStore();
+
+            var index = store.Load();
+
+            Assert.That(store.LastLoadWasCorrupt, Is.True);
+            Assert.That(PersistComparer.Differences(new LibraryIndex(), index), Is.Empty);
+            Assert.That(File.ReadAllText(IndexPath), Is.EqualTo("{\"entries\": ["));
+
+            index.entries.Add(new LibraryEntry { exportId = "3f2c9a0d6b7e4c1fa2b3c4d5e6f70812" });
+            store.Save(index);
+            Assert.That(NewStore().Load().entries.Single().exportId, Is.EqualTo("3f2c9a0d6b7e4c1fa2b3c4d5e6f70812"));
+        }
+
+        [Test]
+        public void UnreadableFileIsNotReplacedWithAnEmptyIndex()
+        {
+            // A folder where the file belongs makes reading it fail with an access error.
+            Directory.CreateDirectory(IndexPath);
+
+            Assert.Throws<UnauthorizedAccessException>(() => NewStore().Load());
+        }
+
+        [Test]
         public void CorruptFlagClearsOnTheNextLoad()
         {
             Directory.CreateDirectory(LibraryDir);
@@ -151,6 +179,18 @@ namespace OpenPerch.Core.Tests.Settings
         }
 
         private LibraryIndexStore NewStore() => new LibraryIndexStore(LibraryDir, _codec);
+
+        // The store names backups with the real clock, so every name the next few seconds could produce is taken by a
+        // folder, which makes the move fail the way a file locked by another process would.
+        private void BlockBackupNames(DateTime fromUtc, int seconds)
+        {
+            var first = TruncateToSeconds(fromUtc);
+            for (var i = 0; i < seconds; i++)
+            {
+                var stamp = first.AddSeconds(i).ToString("yyyyMMdd'T'HHmmss'Z'", CultureInfo.InvariantCulture);
+                Directory.CreateDirectory(IndexPath + ".bak-" + stamp);
+            }
+        }
 
         private static DateTime TruncateToSeconds(DateTime t) => new DateTime(t.Ticks - t.Ticks % TimeSpan.TicksPerSecond, t.Kind);
     }

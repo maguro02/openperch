@@ -33,10 +33,29 @@ namespace OpenPerch.App.Core
         }
 
         /// <summary>
-        /// Moves <paramref name="path"/> to <c>&lt;path&gt;.bak-&lt;UTC time&gt;</c>, adding a counter when that name is taken,
-        /// and returns the new path.
+        /// Moves <paramref name="path"/> to <c>&lt;path&gt;.bak-&lt;UTC time&gt;</c>, adding a counter when that name is taken.
+        /// Returns false, leaving the file where it is, when the move fails with an error <see cref="IsFileError"/> accepts.
         /// </summary>
-        public static string MoveAside(string path, DateTime utcNow)
+        public static bool TryMoveAside(string path, DateTime utcNow)
+        {
+            try
+            {
+                File.Move(path, BackupPath(path, utcNow));
+                return true;
+            }
+            catch (Exception e) when (IsFileError(e))
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// True for the exceptions a file operation throws when the disk, the permissions or another process get in the way,
+        /// as opposed to a bug in the caller.
+        /// </summary>
+        public static bool IsFileError(Exception e) => e is IOException || e is UnauthorizedAccessException;
+
+        private static string BackupPath(string path, DateTime utcNow)
         {
             // ISO 8601 basic format, because ':' is not allowed in Windows file names.
             var stem = path + ".bak-" + utcNow.ToString("yyyyMMdd'T'HHmmss'Z'", CultureInfo.InvariantCulture);
@@ -45,7 +64,6 @@ namespace OpenPerch.App.Core
             {
                 target = stem + "-" + n.ToString(CultureInfo.InvariantCulture);
             }
-            File.Move(path, target);
             return target;
         }
     }

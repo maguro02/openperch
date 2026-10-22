@@ -30,10 +30,21 @@ namespace OpenPerch.App.Core
         }
 
         /// <summary>
-        /// Reads the settings and passes them through <see cref="SettingsNormalizer"/>. A missing file yields the defaults.
-        /// A file the codec cannot parse is moved to <c>settings.json.bak-&lt;UTC time&gt;</c> and the defaults are returned.
-        /// Nothing is written.
+        /// The exception that made the last write attempt fail, or null when the last attempt succeeded or none was made.
+        /// While it is set, the change that failed is still pending.
         /// </summary>
+        public Exception LastWriteError { get; private set; }
+
+        /// <summary>
+        /// Reads the settings and passes them through <see cref="SettingsNormalizer"/>. A missing file yields the defaults.
+        /// A file the codec cannot parse is moved to <c>settings.json.bak-&lt;UTC time&gt;</c> and the defaults are returned;
+        /// when it cannot be moved it stays in place until the next save replaces it.
+        /// </summary>
+        /// <exception cref="IOException">
+        /// The file exists but cannot be read, for example while another process holds it open without sharing. The defaults
+        /// are not returned in this case, because saving them later would overwrite settings that are intact.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">The file exists but reading it is denied; handled as above.</exception>
         public AppSettings Load()
         {
             string text;
@@ -57,9 +68,10 @@ namespace OpenPerch.App.Core
             }
             catch (FormatException)
             {
-                PersistedFile.MoveAside(_path, _time.UtcNow);
+                PersistedFile.TryMoveAside(_path, _time.UtcNow);
                 return SettingsNormalizer.Normalize(new AppSettings());
             }
+
             return SettingsNormalizer.Normalize(loaded);
         }
 
@@ -75,7 +87,9 @@ namespace OpenPerch.App.Core
 
         /// <summary>
         /// Writes the recorded change once one second has passed since the last <see cref="SaveDebounced"/>. Call it every frame.
-        /// If the write fails the change stays pending, the exception propagates, and the next attempt waits another second.
+        /// A failed write leaves the change pending, sets <see cref="LastWriteError"/>, and makes the next attempt wait another
+        /// second. An <see cref="IOException"/> or <see cref="UnauthorizedAccessException"/>, such as a full disk or a file
+        /// locked by another process, is not thrown; any other exception propagates.
         /// </summary>
         public void Pump()
         {
@@ -83,7 +97,10 @@ namespace OpenPerch.App.Core
             WritePending();
         }
 
-        /// <summary>Writes the recorded change now, if there is one. Call it before the app exits.</summary>
+        /// <summary>
+        /// Writes the recorded change now, if there is one. Call it before the app exits. Failures are handled as in
+        /// <see cref="Pump"/>, so an I/O error does not stop the exit; check <see cref="LastWriteError"/> to report it.
+        /// </summary>
         public void Flush()
         {
             if (_pending == null) return;
@@ -96,13 +113,16 @@ namespace OpenPerch.App.Core
             {
                 PersistedFile.WriteAtomic(_path, _codec.Serialize(_pending));
             }
-            catch
+            catch (Exception e)
             {
                 // Restart the delay so a lasting failure, such as a full disk, is retried once a second rather than every frame.
                 _changedAt = _time.MonotonicSeconds;
+                LastWriteError = e;
+                if (PersistedFile.IsFileError(e)) return;
                 throw;
             }
             _pending = null;
+            LastWriteError = null;
         }
     }
 }
