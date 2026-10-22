@@ -13,7 +13,7 @@ namespace OpenPerch.Format
         /// <summary>
         /// Runs the header, manifest JSON, <see cref="ManifestValidator"/>, <see cref="CompatibilityChecker"/>, thumbnail and
         /// bundle SHA-256 checks in that order and stops at the first failure. An unacceptable thumbnail only clears
-        /// <see cref="VerifyResult.ThumbnailOk"/>.
+        /// <see cref="VerifyResult.ThumbnailOk"/>; <see cref="MessageCodes.ForThumbnail"/> tells whether that deserves a warning.
         /// </summary>
         /// <param name="s">A readable, seekable stream over the package.</param>
         /// <param name="fileLength">The length of the package file.</param>

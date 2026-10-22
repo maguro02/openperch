@@ -17,7 +17,13 @@ namespace OpenPerch.Format
         public IReadOnlyList<ManifestError> ManifestErrors = Array.Empty<ManifestError>();
         public CompatResult Compat;
 
-        /// <summary>False when there is no thumbnail or its image header is not acceptable; neither rejects the package.</summary>
+        /// <summary>
+        /// True when the package has a thumbnail whose image header passed <see cref="PngInfo.IsAcceptableThumbnail"/>.
+        /// False also when the package has no thumbnail (<see cref="PackageHeader.ThumbnailLength"/> is 0) or verification
+        /// stopped before the thumbnail step. False never rejects the package by itself. Report
+        /// <see cref="MessageCodes.W_THUMB_REJECTED"/> only when <c>Header.ThumbnailLength != 0 &amp;&amp; !ThumbnailOk</c>
+        /// after the thumbnail step, as <see cref="MessageCodes.ForThumbnail"/> does.
+        /// </summary>
         public bool ThumbnailOk;
 
         /// <summary>Whether the SHA-256 of the bundle section matches the manifest.</summary>

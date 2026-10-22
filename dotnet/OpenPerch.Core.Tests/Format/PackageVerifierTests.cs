@@ -31,6 +31,7 @@ namespace OpenPerch.Core.Tests.Format
             Assert.That(result.ManifestErrors, Is.Empty);
             Assert.That(result.Compat.Code, Is.EqualTo(CompatCode.Ok));
             Assert.That(result.ThumbnailOk, Is.True);
+            Assert.That(MessageCodes.ForThumbnail(result), Is.Null);
             Assert.That(result.Sha256Ok, Is.True);
             Assert.That(result.Accept, Is.True);
             Assert.That(result.Header.BundleLength, Is.EqualTo((ulong)MalformedPackageFactory.BundleLength));
@@ -95,6 +96,7 @@ namespace OpenPerch.Core.Tests.Format
             Assert.That(result.ThumbnailOk, Is.False);
             Assert.That(result.Sha256Ok, Is.True);
             Assert.That(result.Accept, Is.True);
+            Assert.That(MessageCodes.ForThumbnail(result), Is.EqualTo(MessageCodes.W_THUMB_REJECTED));
             Assert.That(MessageCatalog.TryGet(MessageCodes.W_THUMB_REJECTED, out MessageDef def), Is.True);
             Assert.That(def.Severity, Is.EqualTo(MessageSeverity.Warning));
         }
@@ -179,6 +181,8 @@ namespace OpenPerch.Core.Tests.Format
             Assert.That(result.ThumbnailOk, Is.False);
             Assert.That(result.Sha256Ok, Is.False);
             Assert.That(result.Accept, Is.False);
+            Assert.That(result.Header.ThumbnailLength, Is.GreaterThan(0u));
+            Assert.That(MessageCodes.ForThumbnail(result), Is.Null, "the thumbnail was never examined");
         }
 
         [Test]
@@ -190,8 +194,16 @@ namespace OpenPerch.Core.Tests.Format
             VerifyResult result = Verify(package, new StubManifestParser(factory.CreateValidManifest()));
 
             Assert.That(result.Header.ThumbnailOffset, Is.EqualTo(0UL));
+            Assert.That(result.Header.ThumbnailLength, Is.EqualTo(0u));
             Assert.That(result.ThumbnailOk, Is.False);
+            Assert.That(MessageCodes.ForThumbnail(result), Is.Null, "a package without a thumbnail gets no thumbnail warning");
             Assert.That(result.Accept, Is.True);
+        }
+
+        [Test]
+        public void ThumbnailWarningNeedsAResult()
+        {
+            Assert.Throws<ArgumentNullException>(() => MessageCodes.ForThumbnail(null));
         }
 
         [Test]

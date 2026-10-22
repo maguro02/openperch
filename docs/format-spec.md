@@ -76,7 +76,8 @@
   - カラータイプが 2（RGB）か 6（RGBA）
   - インターレースなし
 - IHDR の読み取りでは、PNG のシグネチャ、チャンクの長さ（13）、チャンクの型、チャンクの CRC も確かめます。
-- 条件を満たさないサムネイルは、無いものとして扱います。パッケージは拒否しません（`W_THUMB_REJECTED`）。
+- 条件を満たさないサムネイルは、無いものとして扱います。パッケージは拒否せず、警告 `W_THUMB_REJECTED` を出します。
+- 検証の結果（`VerifyResult`）の `ThumbnailOk` は、サムネイルの無いパッケージ（thumbnailLength が 0）でも false です。`W_THUMB_REJECTED` を出すのは、サムネイルの検査まで進み、`Header.ThumbnailLength != 0 && !ThumbnailOk` のときだけです（`MessageCodes.ForThumbnail`）。サムネイルの無いパッケージには出しません。
 
 ### 1.5 バンドルの読み込み
 
@@ -245,6 +246,8 @@ containerVersion が 1 でないファイルは、ヘッダの検査（1.3 節�
 | 2、3 | `E_IMPORT_MANIFEST` | `E_MANIFEST_` で始まるコード |
 | 4 | `E_IMPORT_INCOMPATIBLE` | `E_COMPAT_` で始まるコード |
 | 6 | `E_IMPORT_SHA256_MISMATCH` | ― |
+
+- サムネイルの不合格（5）は取り込みのエラーにしません。警告 `W_THUMB_REJECTED` を添えるのは `Header.ThumbnailLength != 0 && !ThumbnailOk` のときだけで、サムネイルの無いパッケージには添えません（1.4 節）。
 
 ## 5. メッセージコード
 

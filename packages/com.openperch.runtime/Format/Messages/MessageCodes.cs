@@ -177,5 +177,18 @@ namespace OpenPerch.Format
                 default: throw new ArgumentOutOfRangeException(nameof(support), support, null);
             }
         }
+
+        /// <summary>
+        /// <see cref="W_THUMB_REJECTED"/> when verification reached the thumbnail step and the package has a thumbnail
+        /// (<see cref="PackageHeader.ThumbnailLength"/> is not 0) that was not acceptable; otherwise null. A package without
+        /// a thumbnail also has <see cref="VerifyResult.ThumbnailOk"/> false but gets no warning.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="result"/> is null.</exception>
+        public static string ForThumbnail(VerifyResult result)
+        {
+            if (result == null) throw new ArgumentNullException(nameof(result));
+            bool thumbnailChecked = result.HeaderError == null && result.ManifestErrors.Count == 0 && result.Compat.Accept;
+            return thumbnailChecked && result.Header.ThumbnailLength != 0 && !result.ThumbnailOk ? W_THUMB_REJECTED : null;
+        }
     }
 }
