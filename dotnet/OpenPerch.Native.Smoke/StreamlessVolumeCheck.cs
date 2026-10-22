@@ -61,7 +61,7 @@ namespace OpenPerch.Native.Smoke
                 bool mounted = Diskpart(directory, "create", script, out string output);
                 report.Require(
                     mounted,
-                    mounted ? $"diskpart formats a {fileSystem} virtual disk and mounts it at {letter}:" : $"diskpart formats a {fileSystem} virtual disk ({output})");
+                    mounted ? $"diskpart formats a virtual disk as {fileSystem} and mounts it at {letter}:" : $"diskpart formats a virtual disk as {fileSystem} ({output})");
                 if (!mounted)
                 {
                     return;
