@@ -11,6 +11,8 @@ namespace OpenPerch.Runtime
     /// </remarks>
     public static class RuntimeMigration
     {
+        /// <summary>Brings a deserialized <paramref name="bone"/> up to <see cref="RuntimeSchema.Current"/>.</summary>
+        /// <param name="bone">The component whose fields were just read; only its own fields change.</param>
         public static void Migrate(PerchPhysBone bone)
         {
             if (bone.schemaVersion < 1)
@@ -19,6 +21,8 @@ namespace OpenPerch.Runtime
             }
         }
 
+        /// <summary>Brings a deserialized <paramref name="collider"/> up to <see cref="RuntimeSchema.Current"/>.</summary>
+        /// <param name="collider">The component whose fields were just read; only its own fields change.</param>
         public static void Migrate(PerchPhysBoneCollider collider)
         {
             if (collider.schemaVersion < 1)
@@ -27,6 +31,8 @@ namespace OpenPerch.Runtime
             }
         }
 
+        /// <summary>Brings a deserialized <paramref name="constraint"/> up to <see cref="RuntimeSchema.Current"/>.</summary>
+        /// <param name="constraint">The component whose fields were just read; only its own fields change.</param>
         public static void Migrate(PerchConstraint constraint)
         {
             if (constraint.schemaVersion < 1)
@@ -35,6 +41,8 @@ namespace OpenPerch.Runtime
             }
         }
 
+        /// <summary>Brings a deserialized <paramref name="contact"/> up to <see cref="RuntimeSchema.Current"/>.</summary>
+        /// <param name="contact">The component whose fields were just read; only its own fields change.</param>
         public static void Migrate(PerchContactData contact)
         {
             if (contact.schemaVersion < 1)

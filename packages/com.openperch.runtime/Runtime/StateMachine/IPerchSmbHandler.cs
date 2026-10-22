@@ -8,8 +8,12 @@ namespace OpenPerch.Runtime
     /// </summary>
     public interface IPerchSmbHandler
     {
+        /// <summary>Called only when a state carrying <paramref name="driver"/> is entered; leaving the state calls nothing.</summary>
+        /// <param name="driver">The behaviour that raised the event.</param>
         void OnParameterDriver(PerchParameterDriver driver);
 
+        /// <summary>Called only when a state carrying <paramref name="control"/> is entered; leaving the state calls nothing.</summary>
+        /// <param name="control">The behaviour that raised the event.</param>
         void OnTrackingControl(PerchTrackingControl control);
 
         /// <summary>Called when a state carrying <paramref name="control"/> is entered or exited.</summary>
@@ -23,6 +27,8 @@ namespace OpenPerch.Runtime
         /// <param name="entering">True on state enter, false on state exit.</param>
         void OnPlayableLayerControl(PerchPlayableLayerControl control, bool entering);
 
+        /// <summary>Called only when a state carrying <paramref name="control"/> is entered; leaving the state calls nothing.</summary>
+        /// <param name="control">The behaviour that raised the event.</param>
         void OnLocomotionControl(PerchLocomotionControl control);
     }
 }
