@@ -3,7 +3,7 @@ namespace OpenPerch.Format
     /// <summary>Why a manifest was rejected.</summary>
     public enum ManifestErrorCode
     {
-        /// <summary>The manifest is not valid UTF-8 JSON, or its root is not an object.</summary>
+        /// <summary>The manifest is not valid UTF-8 JSON, its root is not an object, or it nests too deeply.</summary>
         JsonInvalid = 0,
 
         /// <summary>A required field is absent, 0 or an empty string.</summary>
