@@ -43,6 +43,22 @@ namespace OpenPerch.App.Tests.EditMode
         }
 
         [Test]
+        public void MissingFieldsOfAvatarsKeepInitializerValues()
+        {
+            var settings = _codec.Deserialize<AppSettings>(OmittedKeySamples.SettingsJson);
+
+            Assert.That(PersistComparer.Differences(OmittedKeySamples.ExpectedSettings(), settings), Is.Empty);
+        }
+
+        [Test]
+        public void MissingFieldsOfIndexEntriesKeepInitializerValues()
+        {
+            var index = _codec.Deserialize<LibraryIndex>(OmittedKeySamples.IndexJson);
+
+            Assert.That(PersistComparer.Differences(OmittedKeySamples.ExpectedIndex(), index), Is.Empty);
+        }
+
+        [Test]
         public void LeadingByteOrderMarkIsAccepted()
         {
             Assert.That(_codec.Deserialize<AppSettings>("\uFEFF{\"targetFpsCap\": 30}").targetFpsCap, Is.EqualTo(30));

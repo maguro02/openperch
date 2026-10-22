@@ -101,6 +101,19 @@ namespace OpenPerch.Core.Tests.Settings
         }
 
         [Test]
+        public void LoadKeepsEveryValueTheNormalizerAccepts()
+        {
+            var store = NewStore();
+            store.SaveDebounced(SettingsNormalizer.Normalize(PersistFiller.Fill<AppSettings>()));
+            store.Flush();
+
+            var loaded = NewStore().Load();
+
+            var expected = SettingsNormalizer.Normalize(PersistFiller.Fill<AppSettings>());
+            Assert.That(PersistComparer.Differences(expected, loaded), Is.Empty);
+        }
+
+        [Test]
         public void PumpWritesOneSecondAfterTheChange()
         {
             var store = NewStore();
