@@ -136,6 +136,23 @@ namespace OpenPerch.Core.Tests.Desktop
             }));
         }
 
+        [TestCase(WindowClass.Platform, 100)]
+        [TestCase(WindowClass.OccluderOnly, 100)]
+        [TestCase(WindowClass.Taskbar, 100)]
+        [TestCase(WindowClass.Shell, 300)]
+        [TestCase(WindowClass.Desktop, 300)]
+        [TestCase(WindowClass.Self, 300)]
+        [TestCase(WindowClass.Ignored, 300)]
+        [Category("T-GEO")]
+        public void OnlyApplicationAndTaskbarWindowsAboveLimitTheHeadroom(WindowClass aboveKind, int expectedHeadroom)
+        {
+            var tops = TopsOf(2,
+                GeometryTestData.Window(1, aboveKind, new RectI(100, 100, 1100, 200), 0),
+                GeometryTestData.Window(2, WindowClass.Platform, new RectI(100, 300, 1100, 800), 1));
+
+            Assert.That(tops, Is.EqualTo(new[] { $"WindowTop:2 y=300 x=[108,950) h={expectedHeadroom} z=1" }));
+        }
+
         [Test]
         [Category("T-GEO")]
         public void NegativeCoordinatesStayInVirtualScreenSpace()
@@ -196,17 +213,20 @@ namespace OpenPerch.Core.Tests.Desktop
             Assert.That(surfaces, Is.EqualTo(new[] { "Floor:0 y=1079 x=[1920,3840) h=1079 z=-1" }));
         }
 
-        [Test]
+        [TestCase(WindowClass.Platform, true)]
+        [TestCase(WindowClass.OccluderOnly, false)]
+        [TestCase(WindowClass.Taskbar, false)]
+        [TestCase(WindowClass.Shell, false)]
+        [TestCase(WindowClass.Desktop, false)]
+        [TestCase(WindowClass.Self, false)]
+        [TestCase(WindowClass.Ignored, false)]
         [Category("T-GEO")]
-        public void DesktopAndShellWindowsAreNeitherPlatformsNorOccluders()
+        public void OnlyPlatformWindowsHaveWindowTops(WindowClass kind, bool hasTop)
         {
-            var surfaces = GeometryTestData.Compute(GeometryTestData.Load("foreground-desktop"));
+            var tops = TopsOf(1, GeometryTestData.Window(1, kind, new RectI(100, 300, 1100, 800), 0));
 
-            Assert.That(surfaces, Is.EqualTo(new[]
-            {
-                PrimaryFloor,
-                "WindowTop:2 y=300 x=[408,1250) h=300 z=1",
-            }));
+            var expected = hasTop ? new[] { "WindowTop:1 y=300 x=[108,950) h=300 z=0" } : Array.Empty<string>();
+            Assert.That(tops, Is.EqualTo(expected));
         }
 
         [Test]
@@ -234,23 +254,31 @@ namespace OpenPerch.Core.Tests.Desktop
         [Category("T-GEO")]
         public void OnlyApplicationAndTaskbarWindowsAboveCutTheSpan(WindowClass aboveKind, bool cuts)
         {
-            var snapshot = new DesktopSnapshot
-            {
-                Monitors = new[] { GeometryTestData.Monitor(GeometryTestData.PrimaryMonitor, GeometryTestData.PrimaryWork, primary: true) },
-                Windows = new[]
-                {
-                    GeometryTestData.Window(1, aboveKind, new RectI(500, 200, 700, 600), 0),
-                    GeometryTestData.Window(2, WindowClass.Platform, new RectI(100, 300, 1100, 800), 1),
-                },
-            };
-
-            var set = DesktopGeometry.ComputeSurfaces(snapshot, GeometryTestData.PrimaryWork, GeometryTestData.Options());
-            var lower = set.Items.Where(item => item.Owner == new IntPtr(2)).Select(item => GeometryTestData.Describe(item));
+            var tops = TopsOf(2,
+                GeometryTestData.Window(1, aboveKind, new RectI(500, 200, 700, 600), 0),
+                GeometryTestData.Window(2, WindowClass.Platform, new RectI(100, 300, 1100, 800), 1));
 
             var expected = cuts
                 ? new[] { "WindowTop:2 y=300 x=[108,500) h=300 z=1", "WindowTop:2 y=300 x=[700,950) h=300 z=1" }
                 : new[] { "WindowTop:2 y=300 x=[108,950) h=300 z=1" };
-            Assert.That(lower, Is.EqualTo(expected));
+            Assert.That(tops, Is.EqualTo(expected));
+        }
+
+        [TestCase(100, 300, true, 300)]
+        [TestCase(300, 500, false, 300)]
+        [TestCase(299, 500, true, 300)]
+        [TestCase(100, 299, false, 1)]
+        [Category("T-GEO")]
+        public void OnlyWindowsCoveringTheRowAboveTheEdgeCutTheSpan(int aboveTop, int aboveBottom, bool cuts, int expectedHeadroom)
+        {
+            var tops = TopsOf(2,
+                GeometryTestData.Window(1, WindowClass.OccluderOnly, new RectI(400, aboveTop, 600, aboveBottom), 0),
+                GeometryTestData.Window(2, WindowClass.Platform, new RectI(100, 300, 1100, 800), 1));
+
+            var expected = cuts
+                ? new[] { $"WindowTop:2 y=300 x=[108,400) h={expectedHeadroom} z=1", $"WindowTop:2 y=300 x=[600,950) h={expectedHeadroom} z=1" }
+                : new[] { $"WindowTop:2 y=300 x=[108,950) h={expectedHeadroom} z=1" };
+            Assert.That(tops, Is.EqualTo(expected));
         }
 
         [Test]
@@ -395,6 +423,18 @@ namespace OpenPerch.Core.Tests.Desktop
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
                 DesktopGeometry.ComputeSurfaces(fixture.ToSnapshot(), fixture.client, GeometryTestData.Options(scale)));
+        }
+
+        private static string[] TopsOf(int owner, params WindowInfo[] windows)
+        {
+            var snapshot = new DesktopSnapshot
+            {
+                Monitors = new[] { GeometryTestData.Monitor(GeometryTestData.PrimaryMonitor, GeometryTestData.PrimaryWork, primary: true) },
+                Windows = windows,
+            };
+
+            var set = DesktopGeometry.ComputeSurfaces(snapshot, GeometryTestData.PrimaryWork, GeometryTestData.Options());
+            return set.Items.Where(item => item.Owner == new IntPtr(owner)).Select(item => GeometryTestData.Describe(item)).ToArray();
         }
     }
 }

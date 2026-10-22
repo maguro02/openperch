@@ -22,6 +22,33 @@ namespace OpenPerch.Core.Tests.Desktop
             Assert.That(buffer[0], Is.EqualTo(new RectI(700, 200, 750, 500)));
         }
 
+        [TestCase(WindowClass.Taskbar, true)]
+        [TestCase(WindowClass.Platform, true)]
+        [TestCase(WindowClass.OccluderOnly, true)]
+        [TestCase(WindowClass.Shell, false)]
+        [TestCase(WindowClass.Desktop, false)]
+        [TestCase(WindowClass.Self, false)]
+        [TestCase(WindowClass.Ignored, false)]
+        [Category("T-GEO")]
+        public void OnlyApplicationAndTaskbarWindowsAboveAreCollected(WindowClass aboveKind, bool collected)
+        {
+            var snapshot = new DesktopSnapshot
+            {
+                Windows = new[]
+                {
+                    GeometryTestData.Window(1, aboveKind, new RectI(0, 1032, 1920, 1080), 0),
+                    GeometryTestData.Window(2, WindowClass.Platform, new RectI(200, 1000, 1400, 1400), 1),
+                },
+            };
+            var standing = new Surface(SurfaceKind.WindowTop, new IntPtr(2), 1000, 208, 1250, 1000, 1);
+            var buffer = new RectI[DesktopGeometry.MaxOccluders];
+
+            int count = DesktopGeometry.CollectOccluders(snapshot, standing, new RectI(300, 900, 500, 1100), buffer);
+
+            var expected = collected ? new[] { new RectI(300, 1032, 500, 1080) } : Array.Empty<RectI>();
+            Assert.That(buffer.Take(count), Is.EqualTo(expected));
+        }
+
         [Test]
         [Category("T-GEO")]
         public void RectanglesAreClippedToTheAvatarTopmostFirst()
