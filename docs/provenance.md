@@ -23,6 +23,8 @@ runtime パッケージのフィールド、VRChat コンポーネントから�
 
 VRChat 側のシリアライズ名は、SDK 入りのプロジェクトで、VRChat SDK を使う作業についての法務確認（ゲート L）が済んだ後に、各コンポーネントを `SerializedObject` で走査して集めます。対象は VRCPhysBone、VRCPhysBoneCollider、各 VRC Constraint、VRCContactSender / VRCContactReceiver、アバター記述子です。走査は Unity の公開 API だけで行い、SDK の型を参照するコードは書きません。
 
+次のスクリプトを、SDK 入りのプロジェクトの `Assets/Editor/DumpSerializedProperties.cs` として保存します（UnityEditor の API を使うので、Editor フォルダに置きます）。対象の GameObject を選び、メニューの Tools → Dump Serialized Properties を実行すると、付いているコンポーネントごとのプロパティのパスと型が Console に出ます。
+
 ```csharp
 using System.Text;
 using UnityEditor;
@@ -37,11 +39,21 @@ public static class DumpSerializedProperties
         var text = new StringBuilder();
         foreach (Component component in Selection.activeGameObject.GetComponents<Component>())
         {
-            text.AppendLine("## " + component.GetType().FullName);
-            var iterator = new SerializedObject(component).GetIterator();
-            for (bool enter = true; iterator.Next(enter); enter = iterator.propertyType == SerializedPropertyType.Generic)
+            // GetComponents returns null in place of a missing script, which avatars often still carry.
+            if (component == null)
             {
-                text.AppendLine(iterator.propertyPath + " : " + iterator.propertyType);
+                text.AppendLine("## (Missing Script)");
+                continue;
+            }
+
+            text.AppendLine("## " + component.GetType().FullName);
+            using (var serializedObject = new SerializedObject(component))
+            {
+                SerializedProperty iterator = serializedObject.GetIterator();
+                for (bool enter = true; iterator.Next(enter); enter = iterator.propertyType == SerializedPropertyType.Generic)
+                {
+                    text.AppendLine(iterator.propertyPath + " : " + iterator.propertyType);
+                }
             }
         }
         Debug.Log(text.ToString());
