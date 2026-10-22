@@ -1,0 +1,2 @@
+# Blender keeps the previous file as a backup when TestDummy.blend is saved over, by the script or by hand.
+*.blend1
