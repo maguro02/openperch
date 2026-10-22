@@ -59,20 +59,53 @@ VRChat SDK を入れない Unity 2022.3.22f1 のプロジェクトです。エ�
 | `ProjectSettings/ProjectVersion.txt` | 2022.3.22f1（リビジョン 887be4894c44） |
 | `Assets/Editor/TestSupportDefine.cs` | 読み込みのたびに、Standalone のスクリプト定義に `OPENPERCH_TEST_SUPPORT` が無ければ足す。これで `OpenPerch.Runtime.TestSupport`（`FixtureDump`）がコンパイルされる |
 | `Assets/Editor/GenerateTestMotions.cs` | メニュー「OpenPerch/Generate Test Motions」 |
+| `Assets/Fixtures/` | 検証アバターと、その材料（[検証アバターのファイル](#検証アバターのファイル)） |
+
+`OpenPerch.Runtime.TestSupport` は自動では参照されない（asmdef の Auto Referenced が無効）ため、`FixtureDump` を呼ぶスクリプトは、TestSupport を参照する asmdef の中に置きます。`TestSupportDefine.cs` は、その asmdef の外に置きます。`OPENPERCH_TEST_SUPPORT` を条件にした asmdef は定義が入るまでコンパイルされないので、その中に置くと定義を足せなくなります。
 
 ### 初回の準備
 
 1. Unity Hub で 2022.3.22f1 と Windows Build Support (Mono) を入れます。
-2. `fixtures/ExporterHarness` を開きます。初回はスクリプト定義の追加による再コンパイルが一度走ります。バッチモードでテストを流す前に、一度エディタで開いて再コンパイルを済ませてください。
-3. エクスポーターの前提（ユーザーのプロジェクトと同じ条件）に合わせます。
+2. Unity でハーネスを開く前に、生成した `TestDummy.fbx` とシェーダーを `Assets/Fixtures/` にコピーします。リポジトリのルートで次を実行します。
+   ```sh
+   mkdir -p fixtures/ExporterHarness/Assets/Fixtures
+   cp fixtures/models/TestDummy/TestDummy.fbx fixtures/shaders/OpenPerchTestToon/OpenPerchTestToon.shader \
+     fixtures/ExporterHarness/Assets/Fixtures/
+   ```
+   コピーせずに開くと、Unity は対になるファイルの無い `.meta` を削除します。その場合は `git checkout -- fixtures/ExporterHarness/Assets/Fixtures` で `.meta` を戻してから、コピーし直してください。`tools/run-unity-tests.sh` を実行する前も同じです。
+3. `fixtures/ExporterHarness` を開きます。初回はスクリプト定義の追加による再コンパイルが一度走ります。バッチモードでテストを流す前に、一度エディタで開いて再コンパイルを済ませてください。
+4. エクスポーターの前提（ユーザーのプロジェクトと同じ条件）に合わせます。
    - Player Settings: Color Space を Linear にし、Windows の Graphics APIs に Direct3D11 を含めます。
    - Build Settings: 書き出しまで通す場合は Windows（x86_64）に Switch Platform します。
-4. 生成した `TestDummy.fbx` と `fixtures/shaders/OpenPerchTestToon/OpenPerchTestToon.shader` を `Assets/Fixtures/` にコピーします。`Assets/Fixtures/` と `Assets/TestMotions/` はハーネスの `.gitignore` で除外しているので、コミットされません。
-5. TestDummy を [README の手順](../fixtures/models/TestDummy/README.md#unity-への取り込み)で Humanoid として取り込み、マテリアルを `OpenPerch/TestToon` にします。
+
+### 検証アバターのファイル
+
+`Assets/Fixtures/` には、コピーした材料と、それから作った検証アバターを置きます。
+
+| パス（`Assets/Fixtures/` から） | コミット | 内容 |
+|---|---|---|
+| `TestDummy.fbx` | しない（コピー） | `fixtures/models/TestDummy/` で生成した FBX |
+| `OpenPerchTestToon.shader` | しない（コピー） | `fixtures/shaders/OpenPerchTestToon/` のシェーダー |
+| `TestDummy.fbx.meta` | する | GUID、Humanoid の設定、取り出したマテリアルとの対応付け |
+| `OpenPerchTestToon.shader.meta` | する | GUID。マテリアルはこの GUID でシェーダーを参照する |
+| `Materials/` | する | FBX から取り出し、シェーダーを `OpenPerch/TestToon` にしたマテリアル |
+| `TestDummyAvatar.prefab` | する | 検証アバター。[検証アバターの構成手順](#検証アバターの構成手順)のうち ExporterHarness で付ける Perch* のコンポーネントと、小物の初期状態を設定したもの |
+
+コピーの 2 つだけをハーネスの `.gitignore` で除外し、それ以外は `Assets/Fixtures.meta` も含めてコミットします。FBX やシェーダーを作り直したら、同じ場所にもう一度コピーします。`.meta` はそのまま残るので、GUID と取り込みの設定は変わらず、マテリアルと Prefab からの参照も保たれます。
+
+`.meta`・マテリアル・Prefab がまだコミットされていないときは、次の手順で作ってコミットします。
+
+1. コピーした `TestDummy.fbx` を、[README の手順](../fixtures/models/TestDummy/README.md#unity-への取り込み)で Humanoid として取り込みます。Extract Materials の出力先には `Assets/Fixtures/Materials/` を選び、各マテリアルのシェーダーを `OpenPerch/TestToon` にします。
+2. TestDummy をシーンに置き、[検証アバターの構成手順](#検証アバターの構成手順)の Perch* のコンポーネント（PB1〜PB5、C1〜C3、CN1、CT1）を付けて、`Assets/Fixtures/TestDummyAvatar.prefab` として保存します。
+3. `Assets/Fixtures.meta` と、`Assets/Fixtures/` のうちコピーの 2 つ以外をすべてコミットします。
+
+| 項目 | 状態 |
+|---|---|
+| `.meta`・マテリアル・`TestDummyAvatar.prefab` のコミット | 未実施（`TestDummy.fbx` の生成の後に行う） |
 
 ### テストモーションの生成
 
-メニュー「OpenPerch/Generate Test Motions」を実行すると、`Assets/TestMotions/TestMotion_<役割>.anim` を役割ごとに 1 つ作ります。バッチモードでは `-executeMethod OpenPerch.Fixtures.ExporterHarness.GenerateTestMotions.Generate` で実行できます。既存のクリップは GUID を保ったまま上書きします。
+メニュー「OpenPerch/Generate Test Motions」を実行すると、`Assets/TestMotions/TestMotion_<役割>.anim` を役割ごとに 1 つ作ります。バッチモードでは `-executeMethod OpenPerch.Fixtures.ExporterHarness.GenerateTestMotions.Generate` で実行できます。既存のクリップは GUID を保ったまま上書きします。`Assets/TestMotions/` は生成物なので、ハーネスの `.gitignore` で除外しています。
 
 クリップは Humanoid のマッスルカーブ（指・目・顎を除く体の全マッスル）と RootT / RootQ だけで作ります。
 
@@ -117,8 +150,10 @@ TestDummy に次のコンポーネントとアニメーションを設定して�
 | C1 | Collider（Sphere） | `Head` | 空欄 | 頭全体を覆う大きさと位置 | ボーンに直接付けたコライダー |
 | C2 | Collider（Capsule） | `Dynamics` | `LeftUpperLeg` | 太ももを覆う半径と高さ | 1 つの GameObject に複数のコライダー |
 | C3 | Collider（Capsule） | `Dynamics` | `RightUpperLeg` | C2 と同じ | 同上 |
-| CN1 | Parent Constraint | `Charm` | 空欄 | Source 0 = `Hips`（Weight 1）、Source 1 = `RightHand`（Weight 0）。Offset は現在の位置を保つ値にする | 空欄の Target Transform は自分に作用する。Source の Weight のカーブで追従先が切り替わる |
+| CN1 | Parent Constraint | `Charm` | 空欄 | Source 0 = `Hips`（Weight 1。Position Offset と Rotation Offset は、T ポーズでの `Charm` の位置と向きを保つ値）、Source 1 = `RightHand`（Weight 0。Position Offset と Rotation Offset は 0） | 空欄の Target Transform は自分に作用する。Source の Weight のカーブで追従先が切り替わる |
 | CT1 | Contact Receiver（Sphere） | `Head` | 空欄 | Radius 0.1、Parameter = `HeadPat`、Collision Tags = `Hand` | データだけ残り、`HeadPat` は既定値のまま |
+
+CN1 の Source 1 の Offset を 0 にするので、Weight が（0, 1）のとき `Charm` の原点は右手首（`RightHand` の原点）に重なり、向きは `RightHand` にそろいます。Source 1 も Source 0 と同じく現在の位置を保つ値にすると、チャームは右の腰にあったときの相対位置のまま手に追従するだけで、手には移りません。
 
 `Accessory_Hat` と `Accessory_Charm` の GameObject は、初期状態で非アクティブにします。
 
@@ -174,14 +209,17 @@ Write Defaults は全ステートで OFF に揃えます。
 | ID | レイヤー | マスク | 内容 |
 |---|---|---|---|
 | L1 | Outfit | なし | `Outfit` の値（0〜3）ごとのステート。各クリップで `Accessory_Hat` と `Accessory_Charm` の `m_IsActive` を設定する |
-| L2 | HatSize | なし | 1D BlendTree（`HatSize` = 0 で帽子の Scale 0.5、1 で 1.5） |
+| L2 | HatSize | なし | 1D BlendTree。`HatSize` = 0 で `Hat` ボーンの Scale を 0.5、1 で 1.5 にする |
 | L3 | Face | なし | `Face` の値ごとのステート。各クリップで `Body` のシェイプキー（`Smile`、`Angry`、`Surprised`、`Blink`）を設定する。`Face` = 3 のステートに TrackingControl（Eyes = Animation）を付け、クリップで `Blink` を 0 にする。ほかのステートには TrackingControl（Eyes = Tracking）を付ける |
 | L4 | Charm | なし | `CharmInHand` で、CN1 の Source 0 と Source 1 の Weight を（1, 0）と（0, 1）の間で切り替える |
 | L5 | Party | なし | `Party` が true になったら、ParameterDriver（Set `Outfit` = 3、Set `Face` = 1、Set `PartyStep` = 1）を持つステートへ移る。`Party` が false で戻る |
 | L6 | PartyChain | なし | `PartyStep` = 1 になったら、ParameterDriver（Add `HatSize` +0.25、Set `PartyStep` = 0）を持つステートへ移る。`PartyStep` = 0 で戻る |
-| L7 | GestureFace | SDK に同梱の AvatarMask | `GestureLeft` = 1（Fist）のステートで `Angry` を 100 にする。それ以外のステートは空のクリップ |
+| L7 | GestureFace | SDK に同梱の `vrc_HandsOnly` | `GestureLeft` = 1（Fist）のステートで `Angry` を 100 にする。それ以外のステートは空のクリップ |
 
 L5 の Driver が L6 を動かすことで、Driver の連鎖になります。
+
+- L2 は `Hat` ボーン（`Head` の子）の Transform の Scale をアニメーションします。`Accessory_Hat` は SkinnedMeshRenderer なので、その GameObject の Scale を変えても帽子の大きさは変わりません。
+- L7 のマスクで `Body` の blendShape カーブ（`Angry`）が通るには、マスクの Transform の一覧が空であるか、一覧の中で `Body` が有効である必要があります。一覧があって `Body` が無効だと `Body` のカーブが遮断され、E13 と X2 が成り立ちません。構成するときに、`vrc_HandsOnly` の Inspector でこれを確かめます。満たさない場合は、満たす SDK 同梱のマスクに替えて、この表を更新します。
 
 ### Modular Avatar での衣装の統合
 
@@ -205,7 +243,7 @@ L5 の Driver が L6 を動かすことで、Driver の連鎖になります。
 | E8 | M9「怒り」 | `Face` = 2 | 眉の内側と口角が下がる | 未確認 |
 | E9 | M10「驚き」 | `Face` = 3 | 眉が上がって口が開き、目を見開く。まばたきが止まる | 未確認 |
 | E10 | M10 を OFF | `Face` = 0 | 通常の表情に戻り、まばたきが再開する | 未確認 |
-| E11 | M6「チャームを手に」を ON、OFF | `CharmInHand` = true、false | チャームが右手に移り、OFF で右の腰に戻る | 未確認 |
+| E11 | M6「チャームを手に」を ON、OFF | `CharmInHand` = true、false | チャームが右手に移り（`Charm` の原点が右手首に重なる）、OFF で右の腰に戻る | 未確認 |
 | E12 | M7「パーティー」を押す | `Party` = 1（0.6 秒後に 0）。続けて `Outfit` = 3、`Face` = 1、`PartyStep` = 1。さらに `HatSize` が 0.25 増え（上限 1）、`PartyStep` = 0 | 帽子とチャームを表示し、笑顔になり、帽子が一段大きくなる | 未確認 |
 | E13 | ジェスチャーで左手を Fist にする | `GestureLeft` = 1、`GestureWeight` = 1 | 眉の内側と口角が下がる | 未確認 |
 | E14 | アプリを再起動する | `Outfit`、`HatSize`、`CharmInHand` が終了前の値。`Face` = 0 | saved の値どおりの衣装と帽子の大きさ | 未確認 |
@@ -216,7 +254,7 @@ L5 の Driver が L6 を動かすことで、Driver の連鎖になります。
 | ID | 対象 | 期待する結果 | 状態 |
 |---|---|---|---|
 | X1 | SDK のアイコンを使う M1、M4 | アイコンが null になり、警告にコントロール名が出る | 未確認 |
-| X2 | SDK のマスクを使う L7 | `tempAssetDir` に作った AvatarMask に差し替わり、書き出したコントローラーが SDK のアセットを参照しない。E13 の見た目は変わらない | 未確認 |
+| X2 | SDK のマスクを使う L7 | `tempAssetDir` に作った AvatarMask に差し替わり、書き出したコントローラーが SDK のアセットを参照しない。差し替えたマスクも `Body` の blendShape カーブを通し、E13 の見た目は変わらない | 未確認 |
 | X3 | ParameterDriver（L5、L6）と TrackingControl（L3） | Perch の StateMachineBehaviour に置き換わる | 未確認 |
 | X4 | L4 のクリップ | Source の Weight のカーブが `PerchConstraint` の `sourceN.weight` に付け替わる | 未確認 |
 | X5 | PB1、PB4、C1、CN1、CT1（空欄の Root / Target Transform） | 書き出し後、自分の Transform が明示的に入っている | 未確認 |
@@ -227,11 +265,12 @@ L5 の Driver が L6 を動かすことで、Driver の連鎖になります。
 
 アプリが過去のエクスポーターの出力を読めることを、公開したファイルで確かめます。
 
-- **作り方**: ExporterHarness で、TestDummy（OpenPerchTestToon のマテリアルと Perch* のコンポーネント付き）とテストモーションを書き出します。同時に `FixtureDump`（`OpenPerch.Runtime.TestSupport`）で、AvatarDefinition と Perch* のフィールドを期待値 JSON に書き出します。Transform の参照はルートからの相対パスで表します。
+- **作り方**: ExporterHarness で、`TestDummyAvatar.prefab`（OpenPerchTestToon のマテリアルと Perch* のコンポーネント付き）とテストモーションを書き出します。同時に `FixtureDump`（`OpenPerch.Runtime.TestSupport`）で、AvatarDefinition と Perch* のフィールドを期待値 JSON に書き出します。Transform の参照はルートからの相対パスで表します。期待値 JSON を書き出すスクリプトは、TestSupport を参照する asmdef の中に置きます（[ExporterHarness](#exporterharness)）。
 - **公開**: GitHub リリース `fixtures-v<schema>`（`<schema>` は `RuntimeSchema.Current`）のアセットとして、`.opk` と期待値 JSON を添付します。
 - **検証**: SP15 に合格した場合は、Mac の PlayMode テストで `gh release download` したファイルをロードし、`FixtureDump` の結果を期待値 JSON と比べます。Windows 向けのシェーダーはピンクのままでよく、シェーダーのエラーは `LogAssert` で無視します。SP15 が不合格なら、WIN-D のプレイヤーで `--selftest compat <dir>` を実行し、結果の JSON を `docs/test-runs/` に記録します。
 
 | 項目 | 状態 |
 |---|---|
+| 期待値 JSON を書き出すハーネスのスクリプトと、TestSupport を参照する asmdef | 未実施 |
 | `fixtures-v1` の作成と公開 | 未実施 |
 | 検証の経路（Mac の PlayMode か WIN-D の `--selftest`） | SP15 の結論待ち（[docs/spikes.md](spikes.md)） |

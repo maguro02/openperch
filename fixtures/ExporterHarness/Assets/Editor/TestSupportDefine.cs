@@ -8,8 +8,13 @@ namespace OpenPerch.Fixtures.ExporterHarness
 {
     /// <summary>
     /// Keeps <c>OPENPERCH_TEST_SUPPORT</c> in the Standalone scripting defines of this project, which is what
-    /// compiles <c>OpenPerch.Runtime.TestSupport</c> (FixtureDump) for the exporter tests and fixture generation.
+    /// compiles <c>OpenPerch.Runtime.TestSupport</c> (FixtureDump) here.
     /// </summary>
+    /// <remarks>
+    /// TestSupport is not auto-referenced, so only code in an assembly definition that references it can call
+    /// FixtureDump. This file must stay outside any assembly whose define constraints require the symbol: such an
+    /// assembly is not compiled until the symbol exists, so the symbol would never be added.
+    /// </remarks>
     [InitializeOnLoad]
     public static class TestSupportDefine
     {
