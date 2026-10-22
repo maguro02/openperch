@@ -49,8 +49,8 @@ namespace OpenPerch.App.Tests.Shared
         // Every export of UI Automation and of MSAA reaches into other applications' UI.
         private static readonly string[] ForbiddenLibraries = { "uiautomationcore", "oleacc" };
 
-        // Routes to the same information that need no [DllImport] of their own: window messages, the managed process
-        // API and late-bound COM activation.
+        // Routes to the same information that need no [DllImport] of their own: UI Automation's COM and managed
+        // clients, window messages, the managed process API and late-bound COM activation.
         private static readonly string[] ForbiddenSourceTokens =
         {
             "UIAutomation",
