@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "client": { "left": 0, "top": 0, "right": 1920, "bottom": 1032 },
+  "monitors": [
+    {
+      "monitor": { "left": 0, "top": 0, "right": 1920, "bottom": 1080 },
+      "work": { "left": 0, "top": 0, "right": 1920, "bottom": 1032 },
+      "dpi": 96,
+      "primary": true,
+      "deviceName": "\\\\.\\DISPLAY1"
+    }
+  ],
+  "taskbars": [
+    { "bounds": { "left": 0, "top": 1032, "right": 1920, "bottom": 1080 }, "edge": 3, "autoHide": false }
+  ],
+  "windows": [
+    { "id": 1, "pid": 1, "rect": { "left": 0, "top": 1032, "right": 1920, "bottom": 1080 }, "kind": 2, "z": 0, "maximized": false },
+    { "id": 2, "pid": 2, "rect": { "left": 100, "top": 300, "right": 900, "bottom": 800 }, "kind": 0, "z": 1, "maximized": false }
+  ]
+}
