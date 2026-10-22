@@ -30,7 +30,8 @@ namespace OpenPerch.App.Core
         public string[] SubParameters = Array.Empty<string>();
 
         /// <summary>
-        /// Index of the page a sub-menu opens. An index outside the menu, including the default -1, makes the sub-menu do nothing.
+        /// Index of the page a sub-menu opens. An index outside the menu, including the default -1, makes the sub-menu do nothing;
+        /// an index whose page is null opens an empty page.
         /// </summary>
         public int SubMenuIndex = -1;
 

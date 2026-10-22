@@ -112,12 +112,12 @@ namespace OpenPerch.App.Core
 
         /// <summary>
         /// Activates the control at <paramref name="index"/>. A button writes its value and returns the parameter to 0 after
-        /// <see cref="ButtonHoldSeconds"/>; a toggle switches between its value and 0; a sub-menu writes its value and opens its page;
-        /// a puppet opens with its parameter at 1.
+        /// <see cref="ButtonHoldSeconds"/>; a toggle switches between its value and 0; a sub-menu writes its value and opens
+        /// its page, which shows as empty when that page is null; a puppet opens with its parameter at 1.
         /// </summary>
         /// <returns>
         /// False when nothing happened: a puppet is open, the index is empty, the button or toggle has no parameter,
-        /// the sub-menu's page does not exist, or the control type is unknown.
+        /// the sub-menu's index is outside the menu, or the control type is unknown.
         /// </returns>
         /// <remarks>
         /// A button's return to 0 is cancelled by any write the controller makes to the same parameter before it is due, such as
