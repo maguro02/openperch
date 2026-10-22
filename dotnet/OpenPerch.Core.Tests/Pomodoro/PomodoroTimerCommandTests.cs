@@ -98,6 +98,37 @@ namespace OpenPerch.Core.Tests.Pomodoro
         }
 
         [Test]
+        public void PauseJustBeforeTheDeadlineFreezesWhatIsLeft()
+        {
+            StartWork();
+            Clock.Advance(25 * 60 - 0.5);
+
+            Timer.Pause();
+            AdvanceMinutes(60);
+
+            Assert.That(Kinds(Timer.Update()), Is.EqualTo(new[] { (Paused, Working) }));
+            Assert.That(Timer.Paused, Is.True);
+            Assert.That(Timer.Remaining, Is.EqualTo(TimeSpan.FromSeconds(0.5)));
+        }
+
+        [TestCase(0.0, false)]
+        [TestCase(0.5, false)]
+        [TestCase(10800.0, true)]
+        public void PauseDoesNothingOnceTheTimeHasRunOut(double overshootSeconds, bool late)
+        {
+            StartWork();
+            Clock.Advance(25 * 60 + overshootSeconds);
+
+            Timer.Pause();
+            var events = Timer.Update();
+
+            Assert.That(Kinds(events), Is.EqualTo(new[] { (PhaseEnded, Working), (PhaseStarted, ShortBreak) }));
+            Assert.That(events[0].AtUtc, Is.EqualTo(T0.AddMinutes(25)));
+            Assert.That(events.Select(e => e.Late), Is.All.EqualTo(late));
+            Assert.That(Timer.Paused, Is.False);
+        }
+
+        [Test]
         public void SkipEndsWorkNowAndCountsIt()
         {
             StartWork();

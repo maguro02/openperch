@@ -80,13 +80,21 @@ namespace OpenPerch.App.Core
             Enter(next, _time.UtcNow, _time.MonotonicSeconds, false);
         }
 
-        /// <summary>Freezes the current work or break phase. Does nothing if there is none or it is already paused.</summary>
+        /// <summary>
+        /// Freezes the current work or break phase. Does nothing if there is none, it is already paused, or its time has
+        /// already run out, in which case the next <see cref="Update"/> ends it.
+        /// </summary>
         public void Pause()
         {
             if (!IsTimed(Phase) || Paused) return;
 
             var nowUtc = _time.UtcNow;
-            _elapsedBeforeRun = Elapsed(nowUtc, _time.MonotonicSeconds);
+            var elapsed = Elapsed(nowUtc, _time.MonotonicSeconds);
+            // Frozen past its deadline, the phase would sit at zero until resumed, and the transition confirmed after
+            // that would report the resume instead of the deadline as the moment it ran out.
+            if (elapsed >= _length) return;
+
+            _elapsedBeforeRun = elapsed;
             Paused = true;
             _pending.Add(new PomodoroEvent(PomodoroEventKind.Paused, Phase, nowUtc, false));
         }
