@@ -5,6 +5,7 @@ namespace OpenPerch.Format
     /// <summary>A user-facing message shared by the exporter and the app.</summary>
     public sealed class MessageDef
     {
+        /// <exception cref="ArgumentException"><paramref name="code"/> is null or empty.</exception>
         public MessageDef(string code, MessageSeverity severity, string ja, string en, string remedyAnchor, bool autoFix)
         {
             if (string.IsNullOrEmpty(code)) throw new ArgumentException("A code is required.", nameof(code));

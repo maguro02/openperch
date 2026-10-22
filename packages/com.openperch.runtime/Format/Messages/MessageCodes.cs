@@ -96,6 +96,8 @@ namespace OpenPerch.Format
         public const string W_EXPORT_UNITY6_APP_ONLY = "W_EXPORT_UNITY6_APP_ONLY";
         public const string E_EXPORT_UNSUPPORTED_UNITY = "E_EXPORT_UNSUPPORTED_UNITY";
 
+        /// <summary>The detail code for a header error, shown with <see cref="E_IMPORT_HEADER"/>.</summary>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="error"/> is not a defined <see cref="PackageError"/> value.</exception>
         public static string For(PackageError error)
         {
             switch (error)
@@ -116,6 +118,8 @@ namespace OpenPerch.Format
             }
         }
 
+        /// <summary>The detail code for a manifest error, shown with <see cref="E_IMPORT_MANIFEST"/>.</summary>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="code"/> is not a defined <see cref="ManifestErrorCode"/> value.</exception>
         public static string For(ManifestErrorCode code)
         {
             switch (code)
@@ -167,6 +171,7 @@ namespace OpenPerch.Format
             }
         }
 
+        /// <summary>The code for the exporter's verdict on the Unity editor it runs in.</summary>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="support"/> is <see cref="ExporterUnitySupport.Supported"/>.</exception>
         public static string For(ExporterUnitySupport support)
         {

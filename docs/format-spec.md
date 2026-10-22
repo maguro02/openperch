@@ -81,7 +81,7 @@
 
 ### 1.5 バンドルの読み込み
 
-アプリは `AssetBundle.LoadFromFileAsync(path, crc, bundleOffset)` で、ファイルの中のバンドルを直接読みます。展開やコピーはしません。`crc` には manifest の `bundle.crc` を渡します。
+アプリは `AssetBundle.LoadFromFileAsync(path, crc, bundleOffset)` で、ファイルの中のバンドルを直接読みます。展開やコピーはしません。初回のロードでは `crc` に manifest の `bundle.crc` を渡して照合します。照合済みのファイルは `crc` に 0 を渡して読みます。
 
 ## 2. manifest
 

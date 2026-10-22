@@ -9,14 +9,25 @@ namespace OpenPerch.Format
     /// </summary>
     public static class PackageCodec
     {
+        /// <summary>Size of the fixed header in bytes.</summary>
         public const int HeaderLength = 64;
+
+        /// <summary>The only containerVersion this codec reads and writes.</summary>
         public const ushort CurrentContainerVersion = 1;
+
+        /// <summary>Byte offset of the manifest, right after the header; any other manifestOffset is rejected.</summary>
         public const ulong ManifestOffset = 64;
+
+        /// <summary>Largest manifest in bytes (256 KiB); the smallest is 1.</summary>
         public const uint MaxManifestLength = 262144;
+
+        /// <summary>Largest thumbnail in bytes (2 MiB).</summary>
         public const uint MaxThumbnailLength = 2 * 1024 * 1024;
+
+        /// <summary>bundleOffset must be a multiple of this many bytes.</summary>
         public const ulong BundleAlignment = 4096;
 
-        /// <summary>Bundles must be shorter than 2^31 bytes.</summary>
+        /// <summary>Largest bundle in bytes, 2^31 - 1: bundles must be shorter than 2^31 bytes.</summary>
         public const ulong MaxBundleLength = (1UL << 31) - 1;
 
         private const int CrcCoveredLength = 56;

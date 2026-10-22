@@ -38,6 +38,11 @@ namespace OpenPerch.Format
         /// <summary>The part after "+", or "". Ignored when comparing.</summary>
         public string BuildMetadata => _buildMetadata ?? "";
 
+        /// <summary>
+        /// Parses "MAJOR.MINOR.PATCH" with an optional "-" pre-release and "+" build metadata as SemVer 2.0.0 defines them,
+        /// for example "1.0.0" or "1.2.3-beta.1+build.5". Fails on a leading "v", any whitespace, leading zeros where
+        /// SemVer forbids them, and MAJOR, MINOR or PATCH above <see cref="int.MaxValue"/>.
+        /// </summary>
         public static bool TryParse(string s, out SemVer v)
         {
             v = default;

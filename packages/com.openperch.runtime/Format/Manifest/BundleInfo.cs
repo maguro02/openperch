@@ -9,7 +9,10 @@ namespace OpenPerch.Format
         /// <summary>The AssetBundle name, "op-" followed by the exportId.</summary>
         public string name = "";
 
-        /// <summary>The CRC Unity reports for the bundle, passed to <c>AssetBundle.LoadFromFileAsync</c>.</summary>
+        /// <summary>
+        /// The CRC Unity reports for the bundle. The first load passes it to <c>AssetBundle.LoadFromFileAsync</c> to check
+        /// the bundle; later loads of the checked file pass 0.
+        /// </summary>
         public uint crc;
 
         /// <summary>SHA-256 of the bundle section only, as 64 lowercase hex digits.</summary>
