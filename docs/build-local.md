@@ -14,7 +14,7 @@
 
 ## BuildScript.BuildWindowsCli
 
-`OpenPerch.App.Editor.BuildScript.BuildWindowsCli` をバッチモードで呼びます。
+`OpenPerch.App.Editor.BuildScript.BuildWindowsCli` をバッチモードで呼びます。リポジトリのルートで次を実行します。
 
 ```sh
 UNITY=/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity
@@ -22,14 +22,14 @@ UNITY=/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity
   -projectPath app \
   -buildTarget Win64 \
   -executeMethod OpenPerch.App.Editor.BuildScript.BuildWindowsCli \
-  -opOut out/OpenPerch-1.0.0 \
+  -opOut "$PWD/out/OpenPerch-1.0.0" \
   -opVersion 1.0.0 \
   -logFile -
 ```
 
 | 引数 | 内容 |
 |---|---|
-| `-opOut <dir>` | 出力先のフォルダ。`out/` はリポジトリの `.gitignore` で除外している |
+| `-opOut <dir>` | 出力先のフォルダ。絶対パスで渡す（例では `$PWD` を付けている）。リポジトリのルートの `out/` は `.gitignore` で除外している |
 | `-opVersion <semver>` | アプリのバージョン。`PlayerSettings.bundleVersion` と `AppInfo.Version` に埋め込む |
 | `-opDev` | 開発ビルドにする。スクリプト定義に `OPENPERCH_TEST_SUPPORT` を足し、DevTools（`--open <path>`、`--selftest compat <dir>`、`--dev-spawn-two`）を含める |
 | `-opProfile <U2022\|U6000>` | Unity のプロファイル。省略すると `U2022` |
@@ -56,9 +56,15 @@ UNITY=/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity
 | 検査 | 内容 |
 |---|---|
 | 組み込みモジュール | `app/Packages/manifest.json` に animation、cloth、particlesystem、physics、audio、imageconversion、jsonserialize、ui、director、unitywebrequest の各モジュールが無ければ失敗する |
-| 素材のライセンス | `Assets/**/Resources/**`、`Packages/**/Resources/**`（埋め込み・ローカル・キャッシュ済みのパッケージを含む）、`StreamingAssets/**` のファイルを [asset-licenses.json](asset-licenses.json) と照合し、申告の無いファイルがあれば失敗する。出力には `Licenses/` フォルダを入れる |
+| 素材のライセンス | `Assets/**/Resources/**`、`Packages/**/Resources/**`（埋め込み・ローカル・キャッシュ済みのパッケージを含む）、`Assets/StreamingAssets/**` のファイルを [asset-licenses.json](asset-licenses.json) と照合し、申告の無いファイルがあれば失敗する。出力には `Licenses/` フォルダを入れる |
 
-`asset-licenses.json` は `{ "path", "license", "source" }` の配列です。`path` はリポジトリのルートからのパス、`license` は SPDX の識別子です。素材を追加するときは、同じ PR でこのファイルに追記します。
+`asset-licenses.json` は `{ "path", "license", "source" }` の配列です。素材を追加するときは、同じ PR でこのファイルに追記します。
+
+| キー | 書き方 |
+|---|---|
+| `path` | アプリのプロジェクト（`app/`）での Unity のアセットパス。プロジェクトのファイルは `Assets/...`（例: `Assets/StreamingAssets/i18n/ja.json`）、パッケージのファイルは `Packages/<パッケージ名>/...` と書く。パッケージは、埋め込み・ローカル・キャッシュ済みのどれでも、実体の場所や版に依らず同じ書き方になる。`*`（フォルダ名の中の任意の文字列）、`**`（フォルダをまたぐ任意のパス）、`?`（任意の 1 文字）を使える |
+| `license` | SPDX の識別子 |
+| `source` | 素材の出どころ（自作、配布元の URL など） |
 
 ## リリースまでの流れ
 

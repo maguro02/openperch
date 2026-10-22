@@ -1,11 +1,11 @@
 [
   {
-    "path": "app/Assets/StreamingAssets/i18n/ja.json",
+    "path": "Assets/StreamingAssets/i18n/ja.json",
     "license": "MIT",
     "source": "自作"
   },
   {
-    "path": "app/Assets/StreamingAssets/i18n/en.json",
+    "path": "Assets/StreamingAssets/i18n/en.json",
     "license": "MIT",
     "source": "自作"
   }
