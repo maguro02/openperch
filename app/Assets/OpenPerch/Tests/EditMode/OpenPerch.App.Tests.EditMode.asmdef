@@ -15,6 +15,7 @@
     "OpenPerch.App.Mascot",
     "OpenPerch.App.UI",
     "OpenPerch.App.Boot",
+    "OpenPerch.App.Editor",
     "OpenPerch.App.Tests.Shared",
     "UniTask",
     "UnityEngine.TestRunner",

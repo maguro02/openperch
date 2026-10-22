@@ -13,7 +13,7 @@ namespace OpenPerch.App.Editor
     {
         private static readonly string[] RequiredModules =
         {
-            "animation", "cloth", "particlesystem", "physics", "audio",
+            "animation", "assetbundle", "cloth", "particlesystem", "physics", "audio",
             "imageconversion", "jsonserialize", "ui", "director", "unitywebrequest",
         };
 
