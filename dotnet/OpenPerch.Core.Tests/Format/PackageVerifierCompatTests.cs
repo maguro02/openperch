@@ -101,6 +101,9 @@ namespace OpenPerch.Core.Tests.Format
 
             Assert.That(result.Compat.Code, Is.EqualTo(CompatCode.KnownBadExporter));
             Assert.That(result.Accept, Is.False);
+            Assert.That(CompatibilityChecker.TryFindKnownBad(result.Manifest, profile, out KnownBad bad), Is.True);
+            Assert.That(bad.MessageCode, Is.EqualTo(MessageCodes.E_COMPAT_KNOWN_BAD_EXPORTER));
+            Assert.That(bad.Reject, Is.True);
         }
 
         [Test]
@@ -114,6 +117,9 @@ namespace OpenPerch.Core.Tests.Format
             Assert.That(result.Compat.Code, Is.EqualTo(CompatCode.Ok));
             Assert.That(result.Compat.Warnings, Is.EqualTo(new[] { CompatCode.KnownBadExporter }));
             Assert.That(result.Accept, Is.True);
+            Assert.That(CompatibilityChecker.TryFindKnownBad(result.Manifest, profile, out KnownBad bad), Is.True);
+            Assert.That(bad.MessageCode, Is.EqualTo(MessageCodes.W_COMPAT_KNOWN_BAD_EXPORTER));
+            Assert.That(bad.Reject, Is.False);
         }
 
         [Test]

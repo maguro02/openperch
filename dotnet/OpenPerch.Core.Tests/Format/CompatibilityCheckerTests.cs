@@ -151,6 +151,48 @@ namespace OpenPerch.Core.Tests.Format
             AppProfile app = App("2022.3.62f3", false, new KnownBad(">=1.0.0", MessageCodes.E_COMPAT_KNOWN_BAD_EXPORTER, true));
 
             Assert.That(CompatibilityChecker.Check(Exported("2022.3.63f1"), app).Code, Is.EqualTo(CompatCode.NewerThanApp));
+            Assert.That(CompatibilityChecker.TryFindKnownBad(Exported("2022.3.63f1"), app, out _), Is.False);
+        }
+
+        [Test]
+        public void TryFindKnownBadReturnsTheRejectingEntryOverAnEarlierWarning()
+        {
+            var warning = new KnownBad(">=1.0.0 <2.0.0", MessageCodes.W_COMPAT_KNOWN_BAD_EXPORTER, false);
+            var rejection = new KnownBad(">=1.0.0 <1.0.3", MessageCodes.E_COMPAT_KNOWN_BAD_EXPORTER, true);
+            AppProfile app = App("2022.3.62f3", false, warning, rejection);
+            PackageManifest m = Exported("2022.3.22f1", "1.0.1");
+
+            Assert.That(CompatibilityChecker.Check(m, app).Code, Is.EqualTo(CompatCode.KnownBadExporter));
+            Assert.That(CompatibilityChecker.TryFindKnownBad(m, app, out KnownBad bad), Is.True);
+            Assert.That(bad.Range, Is.EqualTo(rejection.Range));
+            Assert.That(bad.MessageCode, Is.EqualTo(rejection.MessageCode));
+            Assert.That(bad.Reject, Is.True);
+        }
+
+        [Test]
+        public void TryFindKnownBadReturnsTheFirstMatchingWarning()
+        {
+            var first = new KnownBad(">=1.0.0 <2.0.0", MessageCodes.W_COMPAT_KNOWN_BAD_EXPORTER, false);
+            var second = new KnownBad(">=1.0.0 <1.5.0", MessageCodes.W_COMPAT_KNOWN_BAD_EXPORTER, false);
+            var unrelated = new KnownBad(">=3.0.0", MessageCodes.E_COMPAT_KNOWN_BAD_EXPORTER, true);
+            AppProfile app = App("2022.3.62f3", false, unrelated, first, second);
+            PackageManifest m = Exported("2022.3.22f1", "1.0.1");
+
+            CompatResult r = CompatibilityChecker.Check(m, app);
+            Assert.That(r.Code, Is.EqualTo(CompatCode.Ok));
+            Assert.That(r.Warnings, Is.EqualTo(new[] { CompatCode.KnownBadExporter }));
+            Assert.That(CompatibilityChecker.TryFindKnownBad(m, app, out KnownBad bad), Is.True);
+            Assert.That(bad.Range, Is.EqualTo(first.Range));
+            Assert.That(bad.Reject, Is.False);
+        }
+
+        [Test]
+        public void TryFindKnownBadFindsNothingOutsideEveryRange()
+        {
+            AppProfile app = App("2022.3.62f3", false, new KnownBad(">=1.0.0 <1.0.3", MessageCodes.E_COMPAT_KNOWN_BAD_EXPORTER, true));
+
+            Assert.That(CompatibilityChecker.TryFindKnownBad(Exported("2022.3.22f1", "1.0.3"), app, out KnownBad bad), Is.False);
+            Assert.That(bad.MessageCode, Is.Null);
         }
 
         [Test]
@@ -207,6 +249,8 @@ namespace OpenPerch.Core.Tests.Format
         {
             Assert.Throws<ArgumentNullException>(() => CompatibilityChecker.Check(null, App("2022.3.62f3")));
             Assert.Throws<ArgumentNullException>(() => CompatibilityChecker.Check(Exported("2022.3.22f1"), null));
+            Assert.Throws<ArgumentNullException>(() => CompatibilityChecker.TryFindKnownBad(null, App("2022.3.62f3"), out _));
+            Assert.Throws<ArgumentNullException>(() => CompatibilityChecker.TryFindKnownBad(Exported("2022.3.22f1"), null, out _));
         }
 
         [Test]

@@ -203,6 +203,7 @@ containerVersion が 1 でないファイルは、ヘッダの検査（1.3 節�
 
 - Unity の系統: 2022 までは major と minor が同じもの、6000 以降は major が同じもの（6000.0 と 6000.3 は同じ系統）。
 - 文字列の比較は大文字と小文字を区別します。
+- 不具合の範囲には、それぞれメッセージコード（`KnownBad.MessageCode`）を割り当て、不具合ごとの説明と対処を示します。KnownBadExporter の判定のもとになった範囲は `CompatibilityChecker.TryFindKnownBad` で得られます。拒否した場合は拒否する範囲のうち最初に一致したもの、警告の場合は最初に一致した範囲です。
 
 ### 3.3 Unity のバージョンの書式
 
@@ -248,6 +249,8 @@ containerVersion が 1 でないファイルは、ヘッダの検査（1.3 節�
 | 6 | `E_IMPORT_SHA256_MISMATCH` | ― |
 
 - サムネイルの不合格（5）は取り込みのエラーにしません。警告 `W_THUMB_REJECTED` を添えるのは `Header.ThumbnailLength != 0 && !ThumbnailOk` のときだけで、サムネイルの無いパッケージには添えません（1.4 節）。
+- 互換性の警告（`W_COMPAT_` で始まるコード）は、受け付けたパッケージに添えます。
+- KnownBadExporter で拒否または警告したときは、判定のもとになった範囲のメッセージコード（`KnownBad.MessageCode`）も添えます（3.2 節）。
 
 ## 5. メッセージコード
 
