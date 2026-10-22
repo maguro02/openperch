@@ -97,7 +97,9 @@ Shader "OpenPerch/TestToon"
                 ApplyCutout(albedo.a);
 
                 float3 n = normalize(i.worldNormal);
-                float ndl = dot(n, normalize(_WorldSpaceLightPos0.xyz));
+                // ForwardBase passes the main directional light's direction already at unit length, and zero when the
+                // scene has no directional light; normalizing that zero would turn the whole color into NaN.
+                float ndl = dot(n, _WorldSpaceLightPos0.xyz);
                 fixed shadow = SHADOW_ATTENUATION(i);
                 half lit = smoothstep(_ShadeThreshold - _ShadeSoftness, _ShadeThreshold + _ShadeSoftness, ndl) * shadow;
                 half3 direct = lerp(_ShadeColor.rgb, half3(1, 1, 1), lit) * _LightColor0.rgb;
