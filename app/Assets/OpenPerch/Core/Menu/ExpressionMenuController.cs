@@ -31,8 +31,9 @@ namespace OpenPerch.App.Core
         private readonly List<int> _pageStack = new List<int>();
         private readonly List<ExpressionMenuControl> _subMenuStack = new List<ExpressionMenuControl>();
 
-        // Keyed by parameter rather than by control, so that pressing another button on the same parameter extends the hold
-        // instead of being cut short by the first button's deadline.
+        // Keyed by parameter rather than by control. The return to 0 stands for letting go of the button, which comes before
+        // whatever the user does next, so a later write to the same parameter, another button's included, replaces the pending
+        // return instead of being undone by it.
         private readonly Dictionary<string, double> _buttonReleaseAt = new Dictionary<string, double>();
         private readonly List<string> _released = new List<string>();
 
@@ -112,6 +113,10 @@ namespace OpenPerch.App.Core
         /// False when nothing happened: a puppet is open, the index is empty, the button or toggle has no parameter,
         /// the sub-menu's page does not exist, or the control type is unknown.
         /// </returns>
+        /// <remarks>
+        /// A button's return to 0 is cancelled by any write the controller makes to the same parameter before it is due, such as
+        /// pressing a toggle, entering a sub-menu or moving a puppet. Pressing a button on that parameter again restarts the hold.
+        /// </remarks>
         public bool Press(int index)
         {
             if (_activePuppet != null) return false;
@@ -123,18 +128,18 @@ namespace OpenPerch.App.Core
             {
                 case ExpressionMenuControlType.Button:
                     if (string.IsNullOrEmpty(control.Parameter)) return false;
-                    _sink.Set(control.Parameter, control.Value);
+                    Write(control.Parameter, control.Value);
                     _buttonReleaseAt[control.Parameter] = _time.MonotonicSeconds + ButtonHoldSeconds;
                     return true;
 
                 case ExpressionMenuControlType.Toggle:
                     if (string.IsNullOrEmpty(control.Parameter)) return false;
-                    _sink.Set(control.Parameter, IsToggleOn(control) ? 0f : control.Value);
+                    Write(control.Parameter, IsToggleOn(control) ? 0f : control.Value);
                     return true;
 
                 case ExpressionMenuControlType.SubMenu:
                     if (control.SubMenuIndex < 0 || control.SubMenuIndex >= _pages.Count) return false;
-                    SetIfNamed(control.Parameter, control.Value);
+                    Write(control.Parameter, control.Value);
                     _pageStack.Add(control.SubMenuIndex);
                     _subMenuStack.Add(control);
                     return true;
@@ -143,7 +148,7 @@ namespace OpenPerch.App.Core
                 case ExpressionMenuControlType.FourAxisPuppet:
                 case ExpressionMenuControlType.RadialPuppet:
                     _activePuppet = control;
-                    SetIfNamed(control.Parameter, 1f);
+                    Write(control.Parameter, 1f);
                     return true;
 
                 default:
@@ -215,7 +220,10 @@ namespace OpenPerch.App.Core
             while (_pageStack.Count > 0) LeaveSubMenu();
         }
 
-        /// <summary>Sets the parameter of every button whose hold has run out back to 0.</summary>
+        /// <summary>
+        /// Sets the parameter of every button whose hold has run out back to 0. A parameter the controller has written since the
+        /// button was pressed is left as it is.
+        /// </summary>
         public void Update()
         {
             if (_buttonReleaseAt.Count == 0) return;
@@ -226,11 +234,7 @@ namespace OpenPerch.App.Core
                 if (now >= pending.Value) _released.Add(pending.Key);
             }
 
-            foreach (var parameter in _released)
-            {
-                _buttonReleaseAt.Remove(parameter);
-                _sink.Set(parameter, 0f);
-            }
+            foreach (var parameter in _released) Write(parameter, 0f);
             _released.Clear();
         }
 
@@ -241,7 +245,7 @@ namespace OpenPerch.App.Core
         {
             var puppet = _activePuppet;
             _activePuppet = null;
-            SetIfNamed(puppet.Parameter, 0f);
+            Write(puppet.Parameter, 0f);
         }
 
         private void LeaveSubMenu()
@@ -250,19 +254,22 @@ namespace OpenPerch.App.Core
             var subMenu = _subMenuStack[top];
             _pageStack.RemoveAt(top);
             _subMenuStack.RemoveAt(top);
-            SetIfNamed(subMenu.Parameter, 0f);
+            Write(subMenu.Parameter, 0f);
         }
 
         private void SetSubParameter(int index, float value)
         {
             var names = _activePuppet.SubParameters;
             if (names == null || index >= names.Length) return;
-            SetIfNamed(names[index], value);
+            Write(names[index], value);
         }
 
-        private void SetIfNamed(string parameter, float value)
+        // Every parameter write goes through here so that each one cancels a pending button return on the same parameter.
+        private void Write(string parameter, float value)
         {
-            if (!string.IsNullOrEmpty(parameter)) _sink.Set(parameter, value);
+            if (string.IsNullOrEmpty(parameter)) return;
+            _buttonReleaseAt.Remove(parameter);
+            _sink.Set(parameter, value);
         }
 
         // Anything not above the minimum comes out as the minimum itself, so negating a centred stick for the down and left axes

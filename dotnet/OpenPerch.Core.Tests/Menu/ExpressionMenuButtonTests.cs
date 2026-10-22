@@ -82,6 +82,98 @@ namespace OpenPerch.Core.Tests.Menu
         }
 
         [Test]
+        public void AToggleOnTheSameParameterDuringTheHoldKeepsItsValue()
+        {
+            var sink = new RecordingParamSink();
+            var time = Clock();
+            var menu = new ExpressionMenuController(new[] { Page(Button("VRCEmote", 1f), Toggle("VRCEmote", 5f)) }, sink, time);
+
+            menu.Press(0);
+            time.Advance(0.4);
+            menu.Press(1);
+            time.Advance(0.3);
+            menu.Update();
+
+            Assert.That(sink.Get("VRCEmote"), Is.EqualTo(5f));
+            Assert.That(menu.IsOn(1), Is.True);
+
+            time.Advance(5.0);
+            menu.Update();
+            Assert.That(sink.Writes, Is.EqualTo(new[] { "VRCEmote=1", "VRCEmote=5" }));
+        }
+
+        [Test]
+        public void ASubMenuOnTheSameParameterDuringTheHoldKeepsItsValue()
+        {
+            var sink = new RecordingParamSink();
+            var time = Clock();
+            var pages = new[] { Page(Button("Mode", 1f), SubMenu(1, "Mode", 2f)), Page(Toggle("Hat", 1f)) };
+            var menu = new ExpressionMenuController(pages, sink, time);
+
+            menu.Press(0);
+            time.Advance(0.4);
+            menu.Press(1);
+            time.Advance(0.3);
+            menu.Update();
+
+            Assert.That(menu.Depth, Is.EqualTo(1));
+            Assert.That(sink.Writes, Is.EqualTo(new[] { "Mode=1", "Mode=2" }));
+        }
+
+        [Test]
+        public void APuppetOnTheSameParameterDuringTheHoldKeepsItOpen()
+        {
+            var sink = new RecordingParamSink();
+            var time = Clock();
+            var pages = new[] { Page(Button("SizeOpen", 1f), Puppet(ExpressionMenuControlType.RadialPuppet, "SizeOpen", "Size")) };
+            var menu = new ExpressionMenuController(pages, sink, time);
+
+            menu.Press(0);
+            time.Advance(0.4);
+            menu.Press(1);
+            time.Advance(0.3);
+            menu.Update();
+
+            Assert.That(menu.ActivePuppet, Is.Not.Null);
+            Assert.That(sink.Writes, Is.EqualTo(new[] { "SizeOpen=1", "SizeOpen=1" }));
+        }
+
+        [Test]
+        public void PuppetInputOnTheSameParameterDuringTheHoldIsKept()
+        {
+            var sink = new RecordingParamSink();
+            var time = Clock();
+            var pages = new[] { Page(Button("Size", 1f), Puppet(ExpressionMenuControlType.RadialPuppet, "", "Size")) };
+            var menu = new ExpressionMenuController(pages, sink, time);
+
+            menu.Press(0);
+            time.Advance(0.4);
+            menu.Press(1);
+            menu.SetRadial(0.25f);
+            time.Advance(0.3);
+            menu.Update();
+
+            Assert.That(sink.Writes, Is.EqualTo(new[] { "Size=1", "Size=0.25" }));
+        }
+
+        [Test]
+        public void WritesToAnotherParameterDuringTheHoldDoNotCancelIt()
+        {
+            var sink = new RecordingParamSink();
+            var time = Clock();
+            var menu = new ExpressionMenuController(new[] { Page(Button("Wave", 1f), Toggle("Hat", 1f)) }, sink, time);
+
+            menu.Press(0);
+            time.Advance(0.4);
+            menu.Press(1);
+            time.Advance(0.3);
+            menu.Update();
+
+            Assert.That(sink.Get("Wave"), Is.EqualTo(0f));
+            Assert.That(sink.Get("Hat"), Is.EqualTo(1f));
+        }
+
+        [Test]
         public void ButtonsOnDifferentParametersReturnIndependently()
         {
             var sink = new RecordingParamSink();
