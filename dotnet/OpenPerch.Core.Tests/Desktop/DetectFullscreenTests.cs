@@ -59,6 +59,16 @@ namespace OpenPerch.Core.Tests.Desktop
             Assert.That(DesktopGeometry.DetectFullscreen(WithForeground(editor), Primary), Is.EqualTo(FullscreenState.None));
         }
 
+        [Test]
+        [Category("T-GEO")]
+        public void MaximizedWindowCoveringTheMonitorWithAnAutoHiddenTaskbarIsNotFullscreen()
+        {
+            var browser = GeometryTestData.WithMaximized(
+                GeometryTestData.Window(1, WindowClass.OccluderOnly, GeometryTestData.PrimaryMonitor, 0), true);
+
+            Assert.That(DesktopGeometry.DetectFullscreen(WithForeground(browser), Primary), Is.EqualTo(FullscreenState.None));
+        }
+
         [TestCase(WindowClass.Platform, FullscreenState.Fullscreen)]
         [TestCase(WindowClass.OccluderOnly, FullscreenState.Fullscreen)]
         [TestCase(WindowClass.Self, FullscreenState.None)]

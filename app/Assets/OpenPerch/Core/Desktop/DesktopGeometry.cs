@@ -115,7 +115,7 @@ namespace OpenPerch.App.Core
         /// <summary>Reports whether a fullscreen application or a presentation is running.</summary>
         /// <remarks>
         /// The busy, Direct3D fullscreen and presentation notification states count on every monitor. Otherwise the foreground window
-        /// must be an application window whose bounds match <paramref name="monitorPx"/> within 2 px on every edge.
+        /// must be a non-maximized application window whose bounds match <paramref name="monitorPx"/> within 2 px on every edge.
         /// </remarks>
         /// <param name="s">Snapshot to read.</param>
         /// <param name="monitorPx">Monitor rectangle the mascot is shown on.</param>
@@ -134,7 +134,9 @@ namespace OpenPerch.App.Core
                 if (w.Hwnd != s.ForegroundHwnd) continue;
                 // Tool windows fail the OccluderOnly test and end up Ignored, so the two application classes are all that remain.
                 bool application = w.Class == WindowClass.Platform || w.Class == WindowClass.OccluderOnly;
-                return application && Matches(w.Bounds, monitorPx, FullscreenTolerancePx) ? FullscreenState.Fullscreen : FullscreenState.None;
+                // With an auto-hidden taskbar a maximized window covers the whole monitor too, but that is ordinary desktop use.
+                bool candidate = application && !w.Maximized;
+                return candidate && Matches(w.Bounds, monitorPx, FullscreenTolerancePx) ? FullscreenState.Fullscreen : FullscreenState.None;
             }
             return FullscreenState.None;
         }
