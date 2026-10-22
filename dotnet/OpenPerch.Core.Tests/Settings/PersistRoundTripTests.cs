@@ -2,6 +2,7 @@ using NUnit.Framework;
 using OpenPerch.App.Core;
 using OpenPerch.App.Tests.Shared;
 using OpenPerch.Core.Tests.Support;
+using OpenPerch.Format;
 
 namespace OpenPerch.Core.Tests.Settings
 {
@@ -26,6 +27,18 @@ namespace OpenPerch.Core.Tests.Settings
         public void LocaleFileKeepsEveryField()
         {
             AssertRoundTrip<LocaleFile>();
+        }
+
+        [Test]
+        public void GeometryFixtureKeepsEveryField()
+        {
+            AssertRoundTrip<GeometryFixture>();
+        }
+
+        [Test]
+        public void PackageManifestKeepsEveryField()
+        {
+            AssertRoundTrip<PackageManifest>();
         }
 
         private void AssertRoundTrip<T>() where T : class, new()

@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using OpenPerch.App.Core;
 using OpenPerch.App.Tests.Shared;
+using OpenPerch.Format;
 
 namespace OpenPerch.Core.Tests.Settings
 {
@@ -13,7 +14,8 @@ namespace OpenPerch.Core.Tests.Settings
         public void PersistedTypesFollowTheRules()
         {
             var violations = PersistTypeRules.Check(
-                typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile), typeof(RectI), typeof(Vec2), typeof(Vec2I));
+                typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile), typeof(RectI), typeof(Vec2), typeof(Vec2I),
+                typeof(GeometryFixture), typeof(PackageManifest));
 
             Assert.That(violations, Is.Empty);
         }
@@ -22,7 +24,8 @@ namespace OpenPerch.Core.Tests.Settings
         public void WalkReachesEveryNestedType()
         {
             var types = PersistTypeRules.ReachableTypes(
-                typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile), typeof(RectI), typeof(Vec2), typeof(Vec2I));
+                typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile), typeof(RectI), typeof(Vec2), typeof(Vec2I),
+                typeof(GeometryFixture), typeof(PackageManifest));
 
             var expected = new[]
             {
@@ -30,6 +33,9 @@ namespace OpenPerch.Core.Tests.Settings
                 typeof(PomodoroConfig), typeof(NotificationSettings), typeof(BehaviorConfig), typeof(DynamicsMotionSettings),
                 typeof(Vec2I), typeof(LibraryIndex), typeof(LibraryEntry), typeof(LocaleFile), typeof(LocaleEntry),
                 typeof(RectI), typeof(Vec2),
+                typeof(GeometryFixture), typeof(FixtureMonitor), typeof(FixtureTaskbar), typeof(FixtureWindow),
+                typeof(PackageManifest), typeof(ExporterInfo), typeof(BundleInfo), typeof(FeatureInfo), typeof(CompositingInfo),
+                typeof(StatsInfo), typeof(WarningInfo), typeof(MotionInfo),
             };
             Assert.That(expected.Except(types), Is.Empty);
         }
