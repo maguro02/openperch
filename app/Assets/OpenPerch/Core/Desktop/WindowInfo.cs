@@ -8,7 +8,10 @@ namespace OpenPerch.App.Core
         public readonly uint Pid;
         public readonly RectI Bounds;
 
-        /// <summary>Empty when DWM could not report the caption button bounds.</summary>
+        /// <summary>
+        /// Virtual-screen physical pixels, like <see cref="Bounds"/>. DWM reports the caption buttons relative to the window,
+        /// so the probe offsets them by the window position. Empty when DWM could not report them.
+        /// </summary>
         public readonly RectI CaptionButtons;
 
         public readonly WindowClass Class;

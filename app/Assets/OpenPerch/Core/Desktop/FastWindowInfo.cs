@@ -8,6 +8,7 @@ namespace OpenPerch.App.Core
         public readonly bool Cloaked;
         public readonly uint Pid;
         public readonly RectI Bounds;
+        /// <summary>Same coordinate space and empty-value rule as <see cref="WindowInfo.CaptionButtons"/>.</summary>
         public readonly RectI CaptionButtons;
 
         public FastWindowInfo(bool exists, bool iconic, bool zoomed, bool cloaked, uint pid, RectI bounds, RectI captionButtons)
