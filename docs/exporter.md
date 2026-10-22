@@ -151,7 +151,7 @@ VRChat SDK を実行する作業なので、ゲート L の後に行います。
 
 ### Unity 6
 
-エクスポーターは、VRChat の SDK が Unity 6 へ移る場合に備えて、Unity 6000.x でもコンパイルが通る状態を保ちます。確認は、Mac で `tools/run-unity-tests.sh` を実行したときの `harness-6000.3-compile` で行います。
+エクスポーターは、VRChat の SDK が Unity 6 へ移る場合に備えて、Unity 6000.x でもコンパイルが通る状態を保ちます。確認は、開発機で `tools/run-unity-tests.ps1` を実行したときの `harness-6000.3-compile` で行います。
 
 - スクリプトは、ExporterHarness（SDK なし）と `packages/` を、リポジトリの中と同じ相対位置のまま一時フォルダにコピーし、そのコピーを Unity 6000.3 のバッチモードで開いて、コンパイルエラーが無いことを確かめます。新しい版の Unity は開いたプロジェクトを移行するので、元のハーネスは開きません（ハーネスの Unity の版は 2022.3.22f1 のままです）。
 - 使う Unity は、環境変数 `UNITY_6000_3` で指定したもの、無ければ Unity Hub の既定の場所にある 6000.3.x です。どちらも無ければ、この項目は SKIP になります。

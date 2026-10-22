@@ -1,31 +1,34 @@
 # ローカルビルド
 
-アプリの Windows 版は、開発者の手元（macOS）でビルドします。v1 の正式なリリースもこの手順で作ります。
+アプリは、開発機（Windows。[windows-test.md](windows-test.md) の WIN-D）でビルドします。v1 の正式なリリースもこの手順で作ります。
 
 ## 必要なもの
 
 | 用途 | 必要なもの |
 |---|---|
-| ビルド（macOS） | Unity 2022.3.62f3 と Windows Build Support (Mono) モジュール |
-| 署名（WIN-D） | Windows SDK の `signtool` と、署名手段（ゲート S で調達するコード署名証明書） |
-| 梱包・公開（macOS） | `zip`、`shasum`、GitHub CLI（`gh`） |
+| ビルド | Unity 2022.3.62f3（Windows の Editor は Mono での Windows ビルドを標準で含む） |
+| 署名 | Windows SDK の `signtool` と、署名手段（ゲート S で調達するコード署名証明書） |
+| 梱包・公開 | PowerShell（`Compress-Archive`、`Get-FileHash`）、GitHub CLI（`gh`） |
 
 アプリの Unity は 2022.3.62f3 です（プロファイル `U2022`）。アプリを Unity 6000.3 LTS に移すかの判定（ゲート U。[spikes.md](spikes.md) の SP12 など）に合格した場合は、6000.3 LTS（プロファイル `U6000`）に切り替えます。エクスポーターと ExporterHarness は、VRChat の指定に合わせて 2022.3.22f1 を使います。
 
 ## BuildScript.BuildWindowsCli
 
-`OpenPerch.App.Editor.BuildScript.BuildWindowsCli` をバッチモードで呼びます。リポジトリのルートで次を実行します。
+`OpenPerch.App.Editor.BuildScript.BuildWindowsCli` をバッチモードで呼びます。リポジトリのルートで、PowerShell から次を実行します。
 
-```sh
-UNITY=/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity
-"$UNITY" -batchmode -quit \
-  -projectPath app \
-  -buildTarget Win64 \
-  -executeMethod OpenPerch.App.Editor.BuildScript.BuildWindowsCli \
-  -opOut "$PWD/out/OpenPerch-1.0.0" \
-  -opVersion 1.0.0 \
-  -logFile -
+```powershell
+$unity = "$env:ProgramFiles\Unity\Hub\Editor\2022.3.62f3\Editor\Unity.exe"
+& $unity -batchmode -quit `
+  -projectPath app `
+  -buildTarget Win64 `
+  -executeMethod OpenPerch.App.Editor.BuildScript.BuildWindowsCli `
+  -opOut "$PWD\out\OpenPerch-1.0.0" `
+  -opVersion 1.0.0 `
+  -logFile - | Out-Host
+$LASTEXITCODE
 ```
+
+Unity.exe は GUI のプログラムなので、出力をパイプで受けて終了を待ちます。
 
 | 引数 | 内容 |
 |---|---|
@@ -34,7 +37,7 @@ UNITY=/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity
 | `-opDev` | 開発ビルドにする。スクリプト定義に `OPENPERCH_TEST_SUPPORT` を足し、DevTools（`--open <path>`、`--selftest compat <dir>`、`--dev-spawn-two`）を含める |
 | `-opProfile <U2022\|U6000>` | Unity のプロファイル。省略すると `U2022` |
 
-ビルドに失敗すると、Unity は 0 以外の終了コードで終わります。ログは `-logFile -` で標準出力に出ます。
+ビルドに失敗すると、Unity は 0 以外の終了コードで終わります（`$LASTEXITCODE`）。ログは `-logFile -` で標準出力に出ます。
 
 ### BuildScript が毎回そろえる設定
 
@@ -55,7 +58,7 @@ UNITY=/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity
 
 | 検査 | 内容 |
 |---|---|
-| 組み込みモジュール | `app/Packages/manifest.json` に animation、cloth、particlesystem、physics、audio、imageconversion、jsonserialize、ui、director、unitywebrequest の各モジュールが無ければ失敗する |
+| 組み込みモジュール | `app/Packages/manifest.json` に animation、assetbundle、cloth、particlesystem、physics、audio、imageconversion、jsonserialize、ui、director、unitywebrequest の各モジュールが無ければ失敗する |
 | 素材のライセンス | `Assets/**/Resources/**`、`Packages/**/Resources/**`（埋め込み・ローカル・キャッシュ済みのパッケージを含む）、`Assets/StreamingAssets/**` のファイルを [asset-licenses.json](asset-licenses.json) と照合し、申告の無いファイルがあれば失敗する。出力には `Licenses/` フォルダを入れる |
 
 `asset-licenses.json` は `{ "path", "license", "source" }` の配列です。素材を追加するときは、同じ PR でこのファイルに追記します。
@@ -68,32 +71,41 @@ UNITY=/Applications/Unity/Hub/Editor/2022.3.62f3/Unity.app/Contents/MacOS/Unity
 
 ## リリースまでの流れ
 
-1. **ビルド（macOS）**: `tools/release.sh build` で、上の `BuildWindowsCli` を呼んで `out/` に出力します。
-2. **署名（WIN-D）**: 署名手段を調達できた場合（ゲート S）だけ行います。出力フォルダを WIN-D にコピーし、`OpenPerch.exe` と同梱の DLL のうち署名の無いもの（`signtool verify /pa` が失敗するもの。自前でビルドした `LibUniWinC.dll` を含む）に署名して、フォルダを Mac に戻します。
-   ```bat
+すべて開発機で行います。`<ver>` はアプリのバージョンです。
+
+1. **ビルド**: 上の `BuildWindowsCli` で `out\OpenPerch-<ver>\` に出力します。
+2. **署名**: 署名手段を調達できた場合（ゲート S）だけ行います。`OpenPerch.exe` と同梱の DLL のうち署名の無いもの（`signtool verify /pa` が失敗するもの。自前でビルドした `LibUniWinC.dll` を含む）に署名します。
+   ```powershell
    signtool sign /fd SHA256 /tr <タイムスタンプサーバーの URL> /td SHA256 /n "<証明書のサブジェクト名>" OpenPerch.exe LibUniWinC.dll
    signtool verify /pa /v OpenPerch.exe
    ```
-3. **梱包と公開（macOS）**: `tools/release.sh package` で、zip、その SHA-256 を書いた `.sha256`、`gh release create --draft` によるドラフトのリリースを作ります。zip の直下には、展開してから起動するよう案内する `README-FIRST.txt` を入れます。
-4. **VPM**: `tools/pack-vpm.sh` で runtime と exporter の VPM 用 zip を作り（`Tests/Runtime` は除く）、同じリリースに添付します。runtime と exporter は同じ SemVer にします。
+3. **梱包**: 出力フォルダの直下に、展開してから起動するよう案内する `README-FIRST.txt` を置き、zip とその SHA-256 を作ります。
+   ```powershell
+   Compress-Archive -Path out\OpenPerch-<ver>\* -DestinationPath out\OpenPerch-<ver>.zip
+   (Get-FileHash -Algorithm SHA256 out\OpenPerch-<ver>.zip).Hash.ToLower() | Set-Content -NoNewline out\OpenPerch-<ver>.zip.sha256
+   ```
+4. **VPM**: runtime と exporter のパッケージを、それぞれ VPM 用の zip にします（`Tests/Runtime` は除く）。runtime と exporter は同じ SemVer にします。
+5. **公開**: ドラフトのリリースを作り、3 と 4 のファイルを添付します。
+   ```powershell
+   gh release create v<ver> --draft --title "OpenPerch <ver>" out\OpenPerch-<ver>.zip out\OpenPerch-<ver>.zip.sha256
+   ```
 
 署名は必ず zip にする前に行います。zip にした後で署名すると、zip と `.sha256` を作り直すことになります。署名手段が無い場合は未署名のまま出し、README に Smart App Control での制限を書きます。
 
-## Windows 機への渡し方
+## 確認用の Windows 機への渡し方
 
-テスト用のビルドは、zip を LAN の共有フォルダ経由で渡します。
+開発機（WIN-D）でビルドした zip を、確認用の機材（WIN-I、VM-C）に USB メモリやネットワークの共有で渡します。
 
-1. Mac で zip と `.sha256` を共有フォルダ（macOS のファイル共有や NAS）に置きます。
-2. Windows 機で zip をローカルのディスクにコピーします。共有フォルダ上や zip の中からは起動しません。
-3. PowerShell でハッシュを確かめます。
+1. zip と `.sha256` を確認用の機材のローカルのディスクにコピーします。共有フォルダ上や zip の中からは起動しません。
+2. PowerShell でハッシュを確かめます。
    ```powershell
-   (Get-FileHash -Algorithm SHA256 .\OpenPerch-1.0.0.zip).Hash.ToLower()
-   Get-Content .\OpenPerch-1.0.0.zip.sha256
+   (Get-FileHash -Algorithm SHA256 .\OpenPerch-<ver>.zip).Hash.ToLower()
+   Get-Content .\OpenPerch-<ver>.zip.sha256
    ```
-4. 展開して、展開先の `OpenPerch.exe` を起動します。
+3. 展開して、展開先の `OpenPerch.exe` を起動します。
    ```powershell
-   Expand-Archive .\OpenPerch-1.0.0.zip -DestinationPath .\OpenPerch-1.0.0
+   Expand-Archive .\OpenPerch-<ver>.zip -DestinationPath .\OpenPerch-<ver>
    ```
-5. テストの記録（`docs/test-runs/`）に、ビルドのバージョンとコミットを書きます。
+4. テストの記録（`docs/test-runs/`）に、ビルドのバージョンとコミットを書きます。
 
-SmartScreen と Smart App Control の確認（[windows-test.md](windows-test.md) の W-SYS-07）では、Mark-of-the-Web が確実に付くよう、共有フォルダではなく、ドラフトのリリースからブラウザでダウンロードした zip を使います。
+SmartScreen と Smart App Control の確認（[windows-test.md](windows-test.md) の W-SYS-07）では、Mark-of-the-Web が確実に付くよう、共有ではなく、ドラフトのリリースからブラウザでダウンロードした zip を使います。

@@ -1,6 +1,6 @@
 # Windows 実機テスト
 
-描画・透過・Win32 の挙動は、Mac 上のテストでは確かめられないため、Windows の実機で次の項目を確認します。
+描画・透過・Win32 の挙動は CI では確かめられないため、Windows の実機で次の項目を確認します。開発機は WIN-D を兼ねます。
 
 ## 機材
 
@@ -22,7 +22,7 @@ Apple Silicon 上の Parallels（ARM64）は、W-WIN・W-RND・性能の確認�
 
 ## ビルドの受け渡し
 
-ビルドは Mac でローカルに作った zip を LAN の共有で渡します。手順は [build-local.md](build-local.md) にあります。
+ビルドは開発機（WIN-D）で作り、WIN-I と VM-C には zip で渡します。手順は [build-local.md](build-local.md) にあります。
 
 ## 結果の記録
 

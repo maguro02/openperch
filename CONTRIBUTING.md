@@ -2,17 +2,21 @@
 
 ## 開発環境
 
+Unity を使う開発と、描画・透過・Win32 の確認は Windows 10/11 で行います。Unity に依存しないロジック（`dotnet/` でテストするもの）は、どの OS でも開発できます。
+
 | 用途 | 必要なもの |
 |---|---|
-| Unity に依存しないロジック（`dotnet/`） | .NET 8 SDK |
-| アプリ本体（`app/`） | Unity 2022.3.62f3 と Windows Build Support (Mono) |
+| Unity に依存しないロジック | .NET 8 SDK |
+| アプリ本体（`app/`） | Unity 2022.3.62f3 |
 | エクスポーターのテスト（`fixtures/ExporterHarness/`） | Unity 2022.3.22f1 |
-| 描画・透過・Win32 の確認 | Windows 10/11 の実機（[docs/windows-test.md](docs/windows-test.md)） |
+| 実機での確認 | [docs/windows-test.md](docs/windows-test.md) の機材 |
 
-```sh
+```powershell
 dotnet test dotnet/OpenPerch.Core.Tests/OpenPerch.Core.Tests.csproj
-tools/run-unity-tests.sh
+powershell -ExecutionPolicy Bypass -File tools/run-unity-tests.ps1
 ```
+
+Unity のプロジェクトはパスが長くなるため、Windows では `git config --global core.longpaths true` を設定し、浅いフォルダ（例: `C:\dev\openperch`）に clone してください。
 
 ## 出自とライセンス
 

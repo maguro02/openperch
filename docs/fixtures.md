@@ -67,12 +67,12 @@ VRChat SDK を入れない Unity 2022.3.22f1 のプロジェクトです。エ�
 
 1. Unity Hub で 2022.3.22f1 と Windows Build Support (Mono) を入れます。
 2. Unity でハーネスを開く前に、生成した `TestDummy.fbx` とシェーダーを `Assets/Fixtures/` にコピーします。リポジトリのルートで次を実行します。
-   ```sh
-   mkdir -p fixtures/ExporterHarness/Assets/Fixtures
-   cp fixtures/models/TestDummy/TestDummy.fbx fixtures/shaders/OpenPerchTestToon/OpenPerchTestToon.shader \
-     fixtures/ExporterHarness/Assets/Fixtures/
+   ```powershell
+   New-Item -ItemType Directory -Force fixtures\ExporterHarness\Assets\Fixtures | Out-Null
+   Copy-Item fixtures\models\TestDummy\TestDummy.fbx, fixtures\shaders\OpenPerchTestToon\OpenPerchTestToon.shader `
+     fixtures\ExporterHarness\Assets\Fixtures\
    ```
-   コピーせずに開くと、Unity は対になるファイルの無い `.meta` を削除します。その場合は `git checkout -- fixtures/ExporterHarness/Assets/Fixtures` で `.meta` を戻してから、コピーし直してください。`tools/run-unity-tests.sh` を実行する前も同じです。
+   コピーせずに開くと、Unity は対になるファイルの無い `.meta` を削除します。その場合は `git checkout -- fixtures/ExporterHarness/Assets/Fixtures` で `.meta` を戻してから、コピーし直してください。`tools/run-unity-tests.ps1` を実行する前も同じです。
 3. `fixtures/ExporterHarness` を開きます。初回はスクリプト定義の追加による再コンパイルが一度走ります。バッチモードでテストを流す前に、一度エディタで開いて再コンパイルを済ませてください。
 4. エクスポーターの前提（ユーザーのプロジェクトと同じ条件）に合わせます。
    - Player Settings: Color Space を Linear にし、Windows の Graphics APIs に Direct3D11 を含めます。
@@ -127,7 +127,7 @@ VRChat SDK を入れない Unity 2022.3.22f1 のプロジェクトです。エ�
 
 ### テストの実行
 
-`tools/run-unity-tests.sh` で、ハーネスの EditMode テスト（`testables` に入れた runtime と exporter のテスト）を流します。エディタの Test Runner からも実行できます。
+`tools/run-unity-tests.ps1` で、ハーネスの EditMode テスト（`testables` に入れた runtime と exporter のテスト）を流します。エディタの Test Runner からも実行できます。
 
 ## 検証アバターの構成手順
 
@@ -267,10 +267,10 @@ L5 の Driver が L6 を動かすことで、Driver の連鎖になります。
 
 - **作り方**: ExporterHarness で、`TestDummyAvatar.prefab`（OpenPerchTestToon のマテリアルと Perch* のコンポーネント付き）とテストモーションを書き出します。同時に `FixtureDump`（`OpenPerch.Runtime.TestSupport`）で、AvatarDefinition と Perch* のフィールドを期待値 JSON に書き出します。Transform の参照はルートからの相対パスで表します。期待値 JSON を書き出すスクリプトは、TestSupport を参照する asmdef の中に置きます（[ExporterHarness](#exporterharness)）。
 - **公開**: GitHub リリース `fixtures-v<schema>`（`<schema>` は `RuntimeSchema.Current`）のアセットとして、`.opk` と期待値 JSON を添付します。
-- **検証**: SP15 に合格した場合は、Mac の PlayMode テストで `gh release download` したファイルをロードし、`FixtureDump` の結果を期待値 JSON と比べます。Windows 向けのシェーダーはピンクのままでよく、シェーダーのエラーは `LogAssert` で無視します。SP15 が不合格なら、WIN-D のプレイヤーで `--selftest compat <dir>` を実行し、結果の JSON を `docs/test-runs/` に記録します。
+- **検証**: アプリの PlayMode テストで `gh release download` したファイルをロードし、`FixtureDump` の結果を期待値 JSON と比べます。プレイヤーでの確認は `--selftest compat <dir>` で行い、結果の JSON を `docs/test-runs/` に記録します。
 
 | 項目 | 状態 |
 |---|---|
 | 期待値 JSON を書き出すハーネスのスクリプトと、TestSupport を参照する asmdef | 未実施 |
 | `fixtures-v1` の作成と公開 | 未実施 |
-| 検証の経路（Mac の PlayMode か WIN-D の `--selftest`） | SP15 の結論待ち（[docs/spikes.md](spikes.md)） |
+| PlayMode テストと `--selftest compat` の実装 | 未実施 |
