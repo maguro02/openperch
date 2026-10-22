@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "lang": "ja",
+  "entries": [
+    { "key": "common.ok", "text": "OK" },
+    { "key": "common.cancel", "text": "キャンセル" },
+
+    { "key": "menu.avatars", "text": "アバター" },
+    { "key": "menu.expressions", "text": "表情" },
+    { "key": "menu.gestures", "text": "ジェスチャー" },
+    { "key": "menu.pomodoro", "text": "ポモドーロ" },
+    { "key": "menu.displaySize", "text": "表示サイズ" },
+    { "key": "menu.hideAvatar", "text": "このアバターを隠す" },
+    { "key": "menu.monitor", "text": "表示モニタ" },
+    { "key": "menu.settings", "text": "設定" },
+    { "key": "menu.quit", "text": "終了" },
+    { "key": "menu.back", "text": "戻る" },
+
+    { "key": "start.title", "text": "はじめに" },
+    { "key": "start.step1", "text": "VCC でアバターのプロジェクトにエクスポーターを導入する" },
+    { "key": "start.step2", "text": "Unity でアバターを書き出す" },
+    { "key": "start.step3", "text": "書き出したファイルを取り込むか、ここへドロップする" },
+    { "key": "start.openGuide", "text": "ガイドを開く" },
+
+    { "key": "hints.title", "text": "使い方のヒント" },
+    { "key": "hints.rightClick", "text": "アバターを右クリックするとメニューが開きます。" },
+    { "key": "hints.drag", "text": "ドラッグで持ち上げ、離すと投げられます。" },
+    { "key": "hints.windowTop", "text": "窓の上に置くと、その上を歩いたり座ったりします。" },
+    { "key": "hints.altPassThrough", "text": "Alt を押している間は、クリックがアバターをすり抜けます。" },
+    { "key": "hints.tray", "text": "設定と終了は、通知領域のアイコンから開けます。" },
+
+    { "key": "settings.title", "text": "設定" },
+    { "key": "settings.library", "text": "ライブラリ" },
+    { "key": "settings.avatar", "text": "アバター" },
+    { "key": "settings.behavior", "text": "挙動" },
+    { "key": "settings.pomodoro", "text": "ポモドーロ" },
+    { "key": "settings.notifications", "text": "通知" },
+    { "key": "settings.language", "text": "言語" },
+    { "key": "settings.languageSystem", "text": "Windows の設定に合わせる" },
+    { "key": "settings.fpsCap", "text": "フレームレートの上限" },
+    { "key": "settings.autostart", "text": "Windows の起動時に開始する" },
+    { "key": "settings.checkUpdates", "text": "更新を確認する" },
+    { "key": "settings.data", "text": "データ" },
+    { "key": "settings.licenses", "text": "ライセンス" },
+    { "key": "settings.diagnostics", "text": "診断" },
+
+    { "key": "params.title", "text": "パラメータ" },
+    { "key": "params.internal", "text": "内部パラメータ" },
+
+    { "key": "library.import", "text": "取り込む" },
+    { "key": "library.remove", "text": "削除" },
+    { "key": "library.inUse", "text": "このアバターはデスクトップに表示中です。先にデスクトップから外してください。" },
+    { "key": "library.needsReimport", "text": "ファイルが見つからないか、壊れています。取り込み直してください。" },
+
+    { "key": "import.untrustedTitle", "text": "別の場所から来たファイルです" },
+    { "key": "import.untrustedBody", "text": "「{name}」はインターネットや別のコンピューターから来たファイルです。自分で書き出したファイルだけを読み込んでください。取り込みますか？" },
+    { "key": "import.lineageTitle", "text": "同じアバターの別の書き出しです" },
+    { "key": "import.lineageBody", "text": "「{name}」は、ライブラリにあるアバターを新しく書き出したものです。どうしますか？" },
+    { "key": "import.lineageReplace", "text": "更新として置き換える（設定を引き継ぐ）" },
+    { "key": "import.lineageAddNew", "text": "別のアバターとして追加する" },
+    { "key": "import.elevated", "text": "管理者として実行しているため、取り込みと読み込みはできません。" },
+    { "key": "import.failed", "text": "ファイルを取り込めませんでした（{code}）。" },
+
+    { "key": "pomodoro.start", "text": "開始" },
+    { "key": "pomodoro.pause", "text": "一時停止" },
+    { "key": "pomodoro.resume", "text": "再開" },
+    { "key": "pomodoro.skip", "text": "スキップ" },
+    { "key": "pomodoro.stop", "text": "停止" },
+    { "key": "pomodoro.working", "text": "作業中" },
+    { "key": "pomodoro.shortBreak", "text": "短い休憩" },
+    { "key": "pomodoro.longBreak", "text": "長い休憩" },
+    { "key": "pomodoro.workEnded", "text": "作業時間が終わりました。休憩しましょう。" },
+    { "key": "pomodoro.breakEnded", "text": "休憩が終わりました。" },
+    { "key": "pomodoro.endedAgo", "text": "{minutes} 分前に終わっていました。" },
+
+    { "key": "balloon.noMotions", "text": "モーションを取り込むと歩き回ります。" }
+  ]
+}
