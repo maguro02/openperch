@@ -25,7 +25,7 @@ blender --background --factory-startup --python fixtures/models/TestDummy/build_
 blender --background --factory-startup --python fixtures/models/TestDummy/build_testdummy.py -- --output-dir /tmp/testdummy --no-blend
 ```
 
-終了時に、メッシュごとの三角形数（合計 約 20,000）とボーン数（48）が標準出力に出ます。生成した `TestDummy.fbx` と `TestDummy.blend` はこのディレクトリにコミットします。
+終了時に、メッシュごとの三角形数（合計 約 20,000）とボーン数（49）が標準出力に出ます。生成した `TestDummy.fbx` と `TestDummy.blend` はこのディレクトリにコミットします。`TestDummy.blend` を上書きしたときに Blender が残すバックアップ（`TestDummy.blend1`）は、このディレクトリの `.gitignore` で除外しています。
 
 ## 構成
 
@@ -42,7 +42,7 @@ blender --background --factory-startup --python fixtures/models/TestDummy/build_
 | `Hair` | 頭髪と髪 3 本 | `TestDummy_Hair` |
 | `Skirt` | スカート | `TestDummy_Cloth` |
 | `Tail` | 尻尾 | `TestDummy_Hair` |
-| `Accessory_Hat` | 帽子（小物 1） | `TestDummy_Accessory` |
+| `Accessory_Hat` | 帽子（小物 1）。全頂点が `Hat` ボーンだけにウェイトを持つ | `TestDummy_Accessory` |
 | `Accessory_Charm` | チャーム（小物 2） | `TestDummy_Accessory` |
 
 マテリアルは単色で、テクスチャはありません。
@@ -55,9 +55,11 @@ blender --background --factory-startup --python fixtures/models/TestDummy/build_
 | 髪 | `Hair_Side_L_0..2`、`Hair_Side_R_0..2`（`Head` の子）、`Hair_Back_0..3`（ポニーテール。`Head` の子） |
 | スカート | `Skirt_Root`（`Hips` の子）と、その子の `Skirt_Front_0..1`、`Skirt_Back_0..1`、`Skirt_Side_L_0..1`、`Skirt_Side_R_0..1` |
 | 尻尾 | `Tail_0..3`（`Hips` の子） |
-| 小物 | `Charm`（`Armature` の直下。体のボーンの子ではない） |
+| 小物 | `Hat`（`Head` の子。原点は帽子の根元）、`Charm`（`Armature` の直下。体のボーンの子ではない） |
 
 Humanoid のボーン名は Unity の `HumanBodyBones` と同じなので、Avatar の自動割り当てで全ボーンが対応付けられます。指のボーンはありません。
+
+帽子の大きさは `Hat` ボーンの Scale で変えます。`Accessory_Hat` は SkinnedMeshRenderer になり、頂点の位置はボーンの行列だけで決まるため、`Accessory_Hat` の GameObject の Scale を変えても描画は変わりません。`Hat` の原点は帽子の根元にあるので、拡大・縮小しても帽子は頭に乗ったままです。
 
 揺れもの・コライダー・Constraint の付け方（`Hair_Back_0` に Root Transform を空欄にした PhysBone を直接付ける、`Charm` を Parent Constraint で体に追従させる、など）は [docs/fixtures.md](../../../docs/fixtures.md) にあります。
 
@@ -74,6 +76,6 @@ Humanoid のボーン名は Unity の `HumanBodyBones` と同じなので、Avat
 
 ## Unity への取り込み
 
-1. `TestDummy.fbx` を Unity プロジェクトの `Assets/` 以下にコピーします。
+1. `TestDummy.fbx` を Unity プロジェクトの `Assets/` 以下にコピーします。ExporterHarness では、コピー先とマテリアルの取り出し先が決まっているので、[docs/fixtures.md](../../../docs/fixtures.md#exporterharness) の手順に従います。
 2. Rig タブで Animation Type を Humanoid、Avatar Definition を Create From This Model にして Apply します。Configure を開き、Humanoid のボーンがすべて割り当てられていることを確認します。
 3. Materials タブでマテリアルを取り出し（Extract Materials）、シェーダーを `OpenPerch/TestToon`（`fixtures/shaders/OpenPerchTestToon/`）に替えます。色は `_Color` に引き継がれます。

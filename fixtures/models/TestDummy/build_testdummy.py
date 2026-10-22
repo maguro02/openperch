@@ -144,6 +144,9 @@ HAIR_SIDE_R_JOINTS = [mirror_x(p) for p in HAIR_SIDE_L_JOINTS]
 HAIR_BACK_JOINTS = [(0.0, 0.11, 1.45), (0.0, 0.15, 1.34), (0.0, 0.165, 1.22), (0.0, 0.155, 1.10), (0.0, 0.135, 0.99)]
 TAIL_JOINTS = [(0.0, 0.085, 0.80), (0.0, 0.17, 0.765), (0.0, 0.26, 0.75), (0.0, 0.34, 0.78), (0.0, 0.40, 0.85)]
 
+HAT_BASE = (0.03, 0.0, 1.51)
+HAT_HEIGHT = 0.085
+
 SKIRT_TOP_Z = 0.80
 SKIRT_BOTTOM_Z = 0.54
 # Ordered by angle from +X towards +Y (0, 90, 180, 270 degrees); skirt_weights indexes this list by quadrant.
@@ -171,6 +174,9 @@ def all_bones():
         joints = [skirt_point(h, phi) for h in (0.0, 0.5, 1.0)]
         bones += chain(name, joints, "Skirt_Root")
     bones += chain("Tail", TAIL_JOINTS, "Hips")
+    # Accessory_Hat becomes a SkinnedMeshRenderer, whose vertices follow its bones only, so scaling the hat needs a
+    # bone of its own. Rooting it at the hat's base keeps a scaled hat sitting on the head.
+    bones.append(("Hat", HAT_BASE, v_add(HAT_BASE, (0.0, 0.0, HAT_HEIGHT)), "Head"))
     # Not parented to the body on purpose: the charm is meant to follow a body bone through a Parent Constraint.
     bones.append(("Charm", (-0.17, -0.03, 0.84), (-0.17, -0.03, 0.80), None))
     return bones
@@ -550,11 +556,11 @@ def build_tail():
 def build_hat():
     hat = MeshBuilder("Accessory_Hat")
     material = "TestDummy_Accessory"
-    base = (0.03, 0.0, 1.51)
-    hat.add_tube([base, v_add(base, (0.0, 0.0, 0.008))], [0.075, 0.075], 32, material, [single("Head")] * 2,
+    base = HAT_BASE
+    hat.add_tube([base, v_add(base, (0.0, 0.0, 0.008))], [0.075, 0.075], 32, material, [single("Hat")] * 2,
                  normal_hint=(1.0, 0.0, 0.0))
-    hat.add_tube([v_add(base, (0.0, 0.0, 0.006)), v_add(base, (0.0, 0.0, 0.05)), v_add(base, (0.0, 0.0, 0.085))],
-                 [0.046, 0.044, 0.042], 32, material, [single("Head")] * 3, normal_hint=(1.0, 0.0, 0.0))
+    hat.add_tube([v_add(base, (0.0, 0.0, 0.006)), v_add(base, (0.0, 0.0, 0.05)), v_add(base, (0.0, 0.0, HAT_HEIGHT))],
+                 [0.046, 0.044, 0.042], 32, material, [single("Hat")] * 3, normal_hint=(1.0, 0.0, 0.0))
     return hat
 
 
