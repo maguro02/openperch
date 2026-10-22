@@ -5,6 +5,7 @@ namespace OpenPerch.App.Core
     /// <summary>A change of the <see cref="PomodoroTimer"/>, handed out by <see cref="PomodoroTimer.Update"/>.</summary>
     public readonly struct PomodoroEvent
     {
+        /// <summary>The kind of change.</summary>
         public readonly PomodoroEventKind Kind;
 
         /// <summary>
@@ -24,6 +25,7 @@ namespace OpenPerch.App.Core
         /// </summary>
         public readonly bool Late;
 
+        /// <summary>Creates an event with the given field values.</summary>
         public PomodoroEvent(PomodoroEventKind kind, PomodoroPhase phase, DateTime atUtc, bool late)
         {
             Kind = kind;

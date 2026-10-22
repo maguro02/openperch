@@ -13,7 +13,8 @@ namespace OpenPerch.App.Core
     /// A 25-minute phase has to end once 25 minutes have passed in real time, even when the machine slept through them,
     /// and on some hosts the monotonic counter stops during sleep while the wall clock does not. The monotonic time is
     /// the floor, so setting the clock back cannot stretch a phase. Setting the clock forward cannot be told apart from
-    /// sleep and ends the phase early, as a late transition.
+    /// sleep: it shortens the phase by as much as the clock moved, and if that carries the phase more than a second past
+    /// its deadline, the phase ends at once as a late transition.
     /// </para>
     /// <para>
     /// Phase lengths are read from the config when a phase starts, so edits apply from the next phase. The auto-start
@@ -34,6 +35,7 @@ namespace OpenPerch.App.Core
         private DateTime _runStartUtc;
         private double _runStartMonotonic;
 
+        /// <summary>Creates a timer in <see cref="PomodoroPhase.Idle"/>.</summary>
         /// <param name="config">Kept by reference and read as described in the remarks.</param>
         /// <param name="time">Source of both the wall-clock and the monotonic time.</param>
         public PomodoroTimer(PomodoroConfig config, ITimeSource time)
@@ -115,6 +117,10 @@ namespace OpenPerch.App.Core
         /// toward the long break, and the auto-start flags decide whether the next phase starts or waits.
         /// Does nothing in Idle and AwaitingNext.
         /// </summary>
+        /// <remarks>
+        /// The events it queues look the same as those of a phase that ran out on time, so a caller that notifies the
+        /// user on <see cref="PomodoroEventKind.PhaseEnded"/> has to recognise the ones caused by its own call.
+        /// </remarks>
         public void Skip()
         {
             if (!IsTimed(Phase)) return;
