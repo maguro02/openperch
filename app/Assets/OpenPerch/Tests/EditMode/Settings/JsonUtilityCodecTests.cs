@@ -45,7 +45,7 @@ namespace OpenPerch.App.Tests.EditMode
         [Test]
         public void LeadingByteOrderMarkIsAccepted()
         {
-            Assert.That(_codec.Deserialize<AppSettings>("﻿{\"targetFpsCap\": 30}").targetFpsCap, Is.EqualTo(30));
+            Assert.That(_codec.Deserialize<AppSettings>("\uFEFF{\"targetFpsCap\": 30}").targetFpsCap, Is.EqualTo(30));
         }
 
         [TestCase("{\"targetFpsCap\": ")]

@@ -23,7 +23,7 @@ namespace OpenPerch.App.Boot
         {
             if (text == null) throw new FormatException("JSON text is null.");
 
-            var json = text.TrimStart('﻿', ' ', '\t', '\r', '\n');
+            var json = text.TrimStart('\uFEFF', ' ', '\t', '\r', '\n');
             // Rejecting non-objects here makes empty and non-object files count as corrupt, as they do with System.Text.Json.
             if (json.Length == 0 || json[0] != '{') throw new FormatException("JSON text is not an object.");
 
