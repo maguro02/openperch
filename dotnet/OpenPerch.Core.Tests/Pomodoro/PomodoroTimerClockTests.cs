@@ -14,6 +14,25 @@ namespace OpenPerch.Core.Tests.Pomodoro
 
         [TestCase(false)]
         [TestCase(true)]
+        public void SleepingLessThanTheTimeLeftShortensThePhaseAndItEndsOnTime(bool monotonicStops)
+        {
+            StartWork();
+            AdvanceMinutes(10);
+
+            Sleep(5 * 60, monotonicStops);
+            Assert.That(Timer.Update(), Is.Empty);
+            Assert.That(Timer.Remaining, Is.EqualTo(TimeSpan.FromMinutes(10)));
+
+            AdvanceMinutes(10);
+            var events = Timer.Update();
+
+            Assert.That(Kinds(events), Is.EqualTo(new[] { (PhaseEnded, Working), (PhaseStarted, ShortBreak) }));
+            Assert.That(events.Select(e => e.Late), Is.All.False);
+            Assert.That(events[0].AtUtc, Is.EqualTo(T0.AddMinutes(25)));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
         public void SleepingThroughSeveralDeadlinesConfirmsOneLateTransition(bool monotonicStops)
         {
             Config.autoStartBreak = true;
@@ -63,6 +82,29 @@ namespace OpenPerch.Core.Tests.Pomodoro
             Assert.That(events.Select(e => e.Late), Is.All.True);
             Assert.That(events[0].AtUtc, Is.EqualTo(T0.AddMinutes(25)));
             Assert.That(Timer.Phase, Is.EqualTo(AwaitingNext));
+        }
+
+        [TestCase(ShortBreak, 5, true)]
+        [TestCase(ShortBreak, 5, false)]
+        [TestCase(LongBreak, 15, true)]
+        [TestCase(LongBreak, 15, false)]
+        public void SleepingThroughABreakConfirmsOneLateTransition(PomodoroPhase breakPhase, int breakMinutes, bool autoStartWork)
+        {
+            Config.autoStartWork = autoStartWork;
+            DriveTo(breakPhase);
+
+            Sleep(ThreeHours, true);
+            var events = Timer.Update();
+
+            var next = autoStartWork ? Working : AwaitingNext;
+            Assert.That(Kinds(events), Is.EqualTo(new[] { (PhaseEnded, breakPhase), (PhaseStarted, next) }));
+            Assert.That(events.Select(e => e.Late), Is.All.True);
+            Assert.That(events[0].AtUtc, Is.EqualTo(T0.AddMinutes(25 + breakMinutes)));
+            Assert.That(events[1].AtUtc, Is.EqualTo(Clock.UtcNow));
+            Assert.That(Timer.Phase, Is.EqualTo(next));
+            Assert.That(Timer.Remaining, Is.EqualTo(autoStartWork ? TimeSpan.FromMinutes(25) : TimeSpan.Zero));
+            Assert.That(Timer.CompletedWorkCount, Is.EqualTo(1));
+            Assert.That(Timer.Update(), Is.Empty);
         }
 
         [Test]

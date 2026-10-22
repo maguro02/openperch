@@ -25,7 +25,16 @@ namespace OpenPerch.Core.Tests.Pomodoro
             Assert.That(Timer.Paused, Is.False);
             Assert.That(Timer.Remaining, Is.EqualTo(TimeSpan.Zero));
             Assert.That(Timer.CompletedWorkCount, Is.EqualTo(0));
-            Assert.That(Timer.Update(), Is.Empty);
+            Assert.That(Timer.Update(), Is.SameAs(Array.Empty<PomodoroEvent>()));
+        }
+
+        [Test]
+        public void FrameWithNothingToReportReturnsTheSharedEmptyList()
+        {
+            StartWork();
+            AdvanceMinutes(1);
+
+            Assert.That(Timer.Update(), Is.SameAs(Array.Empty<PomodoroEvent>()));
         }
 
         [Test]
