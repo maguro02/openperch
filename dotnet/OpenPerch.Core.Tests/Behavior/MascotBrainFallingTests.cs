@@ -61,10 +61,11 @@ namespace OpenPerch.Core.Tests.Behavior
         }
 
         [Test]
-        public void LandsWhereTheSweptSegmentCrossesTheSurface()
+        public void LandsWhereThePathOfTheFeetCrossesTheSurface()
         {
-            // Thrown sideways from (300, 500) at 600 px/s, the tick that crosses y = 600 runs from x = 460 to x = 480 and
-            // crosses at x ≈ 474.65. Only the crossing lies in [400, 477).
+            // Thrown sideways from (300, 500) at 600 px/s, the feet fall 100 px in √(200 / g) ≈ 0.2915 s and cross y = 600
+            // at x ≈ 474.87, in the tick that runs from x = 460 to x = 480. The straight line between that tick's ends
+            // would cross at x ≈ 474.65. Only the crossing lies in [400, 477).
             var h = new BrainHarness(
                 TestDesk.FixedDwell(100f), TestDesk.Desk(TestDesk.Window(101, 600, 400, 477)), new Vec2(300f, 1040f), MotionAvailability.None, 0.5f);
             h.Settle();
@@ -74,13 +75,13 @@ namespace OpenPerch.Core.Tests.Behavior
             BrainOutput landed = h.StepUntil(o => o.State != MascotState.Falling);
 
             Assert.That(landed.FeetPx.y, Is.EqualTo(600f));
-            Assert.That(landed.FeetPx.x, Is.EqualTo(474.65f).Within(0.05f));
+            Assert.That(landed.FeetPx.x, Is.EqualTo(474.87f).Within(0.05f));
         }
 
         [Test]
         public void PassesASpanThatOnlyTheEndOfTheTickIsAbove()
         {
-            // Same throw: the crossing at x ≈ 474.65 is left of [478, 1000) although the tick ends at x = 480 inside it.
+            // Same throw: the crossing at x ≈ 474.87 is left of [478, 1000) although the tick ends at x = 480 inside it.
             var h = new BrainHarness(
                 TestDesk.FixedDwell(100f), TestDesk.Desk(TestDesk.Window(101, 600, 478, 1000)), new Vec2(300f, 1040f), MotionAvailability.None, 0.5f);
             h.Settle();

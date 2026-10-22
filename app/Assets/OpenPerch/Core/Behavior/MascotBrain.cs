@@ -19,9 +19,9 @@ namespace OpenPerch.App.Core
         private const float UnhideDelaySec = 2f;
         private const float JumpApexAboveTargetRatio = 0.25f;
 
-        // The crossing found on the straight segment between two ticks lies slightly before the parabola's own,
-        // so a jump aimed exactly at the near edge of a span would just miss it.
-        private const float JumpLandingInsetPx = 2f;
+        // The landing is solved on the integrated path, so it misses the aimed point by rounding only; aiming this far
+        // inside the span keeps a jump to its very end from landing just outside it.
+        private const float JumpLandingInsetPx = 1f;
 
         // Sums of 1/30 s steps drift by a few ulps; without the slack a 0.5 s threshold could take one tick more.
         private const float TimeEpsilon = 1e-4f;
@@ -160,25 +160,18 @@ namespace OpenPerch.App.Core
             float g = Gravity(input);
             float vx = _velocity.x;
             float vy = Math.Min(_velocity.y, TerminalSpeedPx);
-            float y;
-            if (vy + g * dt <= TerminalSpeedPx)
-            {
-                y = start.y + vy * dt + 0.5f * g * dt * dt;
-                vy += g * dt;
-            }
-            else
-            {
-                float accelerating = (TerminalSpeedPx - vy) / g;
-                y = start.y + vy * accelerating + 0.5f * g * accelerating * accelerating + TerminalSpeedPx * (dt - accelerating);
-                vy = TerminalSpeedPx;
-            }
 
-            var end = new Vec2(start.x + vx * dt, y);
-            if (TrySweep(input, start, end, out Vec2 landing))
+            // Gravity stops adding speed at the terminal speed, which the fall can reach part way through the tick.
+            bool reachesTerminal = vy + g * dt > TerminalSpeedPx;
+            float acceleratingSec = reachesTerminal ? (TerminalSpeedPx - vy) / g : dt;
+            float yAccelerated = start.y + vy * acceleratingSec + 0.5f * g * acceleratingSec * acceleratingSec;
+            var end = new Vec2(start.x + vx * dt, yAccelerated + TerminalSpeedPx * (dt - acceleratingSec));
+            if (TrySweep(input, start, vx, vy, g, acceleratingSec, yAccelerated, end.y, out Vec2 landing))
             {
                 return Land(input, landing);
             }
 
+            vy = reachesTerminal ? TerminalSpeedPx : vy + g * dt;
             if (TryGetFloor(input.Surfaces, out Surface floor))
             {
                 if (end.x < floor.X0)
@@ -202,11 +195,20 @@ namespace OpenPerch.App.Core
             return AirborneOutput(input, end);
         }
 
-        private bool TrySweep(in BrainInput input, Vec2 start, Vec2 end, out Vec2 landing)
+        private bool TrySweep(
+            in BrainInput input,
+            Vec2 start,
+            float vx,
+            float vy,
+            float g,
+            float acceleratingSec,
+            float yAccelerated,
+            float yEnd,
+            out Vec2 landing)
         {
             landing = default;
             Surface[] items = input.Surfaces?.Items;
-            if (items == null || !(end.y > start.y))
+            if (items == null)
             {
                 return false;
             }
@@ -215,21 +217,52 @@ namespace OpenPerch.App.Core
             for (int k = 0; k < items.Length; k++)
             {
                 Surface s = items[k];
-                if (s.Y < start.y || s.Y > end.y || !IsLandable(s, input.DisplayHeightPx))
+                if (!IsLandable(s, input.DisplayHeightPx))
                 {
                     continue;
                 }
 
-                float t = (s.Y - start.y) / (end.y - start.y);
-                float x = start.x + (end.x - start.x) * t;
-                if (t < best && x >= s.X0 && x < s.X1)
+                float t = DescentTime(s.Y, start.y, vy, g, acceleratingSec, yAccelerated, yEnd);
+                if (!(t >= 0f) || !(t < best))
+                {
+                    continue;
+                }
+
+                float x = start.x + vx * t;
+                if (x >= s.X0 && x < s.X1)
                 {
                     best = t;
                     landing = new Vec2(x, s.Y);
                 }
             }
 
-            return best <= 1f;
+            return best < float.PositiveInfinity;
+        }
+
+        /// <summary>
+        /// Seconds into the tick at which the feet come down through height <paramref name="y"/>, or -1 when they do not.
+        /// </summary>
+        /// <remarks>
+        /// Solved on the path itself: the straight line between the tick's ends crosses short of it by a distance that
+        /// grows with gravity, enough at high pixels per metre to make a jump to the near end of a span miss it.
+        /// </remarks>
+        private static float DescentTime(float y, float startY, float vy, float g, float acceleratingSec, float yAccelerated, float yEnd)
+        {
+            float below = y - startY;
+            if (below < 0f || y > yEnd)
+            {
+                return -1f;
+            }
+
+            if (y > yAccelerated)
+            {
+                return acceleratingSec + (y - yAccelerated) / TerminalSpeedPx;
+            }
+
+            // The later root of startY + vy·t + g·t²/2 = y, in the form that does not cancel when vy > 0.
+            float root = MathF.Sqrt(vy * vy + 2f * g * below);
+            float t = vy > 0f ? 2f * below / (vy + root) : g > 0f ? (root - vy) / g : 0f;
+            return Math.Min(t, acceleratingSec);
         }
 
         private bool IsLandable(in Surface s, float displayHeightPx)

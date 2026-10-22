@@ -19,14 +19,14 @@ namespace OpenPerch.Core.Tests.Behavior
         // Rise 0.
         private static readonly Surface Level = TestDesk.Window(3, 1040, 1000, 1200);
 
-        // Rise 200, but the nearest landing point x = 1702 is 1002 px > 2.5 × 360 away.
+        // Rise 200, but the nearest landing point x = 1701 is 1001 px > 2.5 × 360 away.
         private static readonly Surface TooFar = TestDesk.Window(4, 840, 1700, 1900);
 
-        // Rise 200 and 403 px away, but only 300 px of headroom.
+        // Rise 200 and 402 px away, but only 300 px of headroom.
         private static readonly Surface Cramped = TestDesk.Window(5, 840, 100, 300, 300);
 
         // Rise 200; the nearest landing point x = 1060 is exactly one avatar height away, so it weighs 1/2.
-        private static readonly Surface OneHeightAway = TestDesk.Window(6, 840, 1058, 1400);
+        private static readonly Surface OneHeightAway = TestDesk.Window(6, 840, 1059, 1400);
 
         [TestCase(0f)]
         [TestCase(0.5f)]
@@ -94,6 +94,26 @@ namespace OpenPerch.Core.Tests.Behavior
             Assert.That(o.FeetPx.y, Is.EqualTo(840f));
             Assert.That(o.FeetPx.x, Is.EqualTo(1060f).Within(0.5f));
             Assert.That(ticks * dt, Is.EqualTo(flightSec).Within(dt));
+        }
+
+        [Test]
+        public void LandsOnTheNearEndOfASpanAtHighPixelsPerMetre()
+        {
+            // A 1 m avatar shown 720 px tall jumps 1798 px, close to the 1800 px limit, onto a window top 58 px up. In its
+            // last tick the straight line between the tick's ends crosses y = 982 at x ≈ 1855.7, outside [1857, 1919);
+            // the path itself comes down at the aimed x = 1858.
+            var h = new BrainHarness(
+                TestDesk.FixedDwell(1f), TestDesk.Desk(TestDesk.Window(7, 982, 1857, 1919)), new Vec2(60f, 1040f), Jumping, 0f, JumpDraw, 0.5f, 0f);
+            h.Input.DisplayHeightPx = 720f;
+            h.Input.PixelsPerMeter = 720f;
+            Assert.That(h.Settle().State, Is.EqualTo(MascotState.Idle));
+
+            Assert.That(h.Steps(30).State, Is.EqualTo(MascotState.Jump));
+            BrainOutput landed = h.StepUntil(o => o.State != MascotState.Jump);
+
+            Assert.That(landed.State, Is.EqualTo(MascotState.Landing));
+            Assert.That(landed.FeetPx.y, Is.EqualTo(982f));
+            Assert.That(landed.FeetPx.x, Is.EqualTo(1858f).Within(0.01f));
         }
 
         [TestCase(MotionAvailability.Idle | MotionAvailability.Fall)]
