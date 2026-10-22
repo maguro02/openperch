@@ -192,6 +192,11 @@ namespace OpenPerch.Runtime.Tests.Editor
             {
                 problems.Add(frozen.name + ": interfaces changed from [" + frozenInterfaces + "] to [" + currentInterfaces + "]");
             }
+
+            if (current.serializable != frozen.serializable)
+            {
+                problems.Add(frozen.name + ": [Serializable] " + (current.serializable ? "added" : "removed"));
+            }
         }
 
         private static Dictionary<string, SchemaType> ActualTypes()

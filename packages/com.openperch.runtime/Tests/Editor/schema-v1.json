@@ -7,6 +7,7 @@
       "kind": "class",
       "baseType": "UnityEngine.ScriptableObject",
       "interfaces": [],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -60,6 +61,7 @@
       "kind": "class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": true,
       "fields": [
         {
           "name": "type",
@@ -121,6 +123,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -146,6 +149,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -167,6 +171,7 @@
       "kind": "class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": true,
       "fields": [
         {
           "name": "name",
@@ -196,6 +201,7 @@
       "kind": "class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": true,
       "fields": [
         {
           "name": "enableEyeLook",
@@ -277,6 +283,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -298,6 +305,7 @@
       "kind": "interface",
       "baseType": "",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": []
     },
@@ -306,6 +314,7 @@
       "kind": "class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": true,
       "fields": [
         {
           "name": "name",
@@ -351,6 +360,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -384,6 +394,7 @@
       "kind": "class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": true,
       "fields": [
         {
           "name": "name",
@@ -401,6 +412,7 @@
       "kind": "class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": true,
       "fields": [
         {
           "name": "id",
@@ -454,6 +466,7 @@
       "kind": "class",
       "baseType": "UnityEngine.ScriptableObject",
       "interfaces": [],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -479,6 +492,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -520,6 +534,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -541,6 +556,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -562,6 +578,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -579,6 +596,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -596,6 +614,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -621,6 +640,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -642,6 +662,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -661,6 +682,7 @@
       "interfaces": [
         "UnityEngine.ISerializationCallbackReceiver"
       ],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -858,6 +880,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -891,6 +914,7 @@
       "kind": "struct",
       "baseType": "System.ValueType",
       "interfaces": [],
+      "serializable": true,
       "fields": [
         {
           "name": "source",
@@ -918,6 +942,7 @@
       "interfaces": [
         "UnityEngine.ISerializationCallbackReceiver"
       ],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -987,6 +1012,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -1008,6 +1034,7 @@
       "kind": "class",
       "baseType": "UnityEngine.StateMachineBehaviour",
       "interfaces": [],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -1037,6 +1064,7 @@
       "kind": "class",
       "baseType": "UnityEngine.StateMachineBehaviour",
       "interfaces": [],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -1054,6 +1082,7 @@
       "kind": "class",
       "baseType": "UnityEngine.StateMachineBehaviour",
       "interfaces": [],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -1077,6 +1106,7 @@
       "interfaces": [
         "UnityEngine.ISerializationCallbackReceiver"
       ],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -1300,6 +1330,7 @@
       "interfaces": [
         "UnityEngine.ISerializationCallbackReceiver"
       ],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -1349,6 +1380,7 @@
       "kind": "class",
       "baseType": "UnityEngine.StateMachineBehaviour",
       "interfaces": [],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -1374,6 +1406,7 @@
       "kind": "class",
       "baseType": "UnityEngine.StateMachineBehaviour",
       "interfaces": [],
+      "serializable": false,
       "fields": [
         {
           "name": "schemaVersion",
@@ -1395,6 +1428,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {
@@ -1420,6 +1454,7 @@
       "kind": "static class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": []
     },
@@ -1428,6 +1463,7 @@
       "kind": "static class",
       "baseType": "System.Object",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": []
     },
@@ -1436,6 +1472,7 @@
       "kind": "enum",
       "baseType": "System.Enum",
       "interfaces": [],
+      "serializable": false,
       "fields": [],
       "enumValues": [
         {

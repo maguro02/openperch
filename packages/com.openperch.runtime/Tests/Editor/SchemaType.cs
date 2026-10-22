@@ -18,6 +18,13 @@ namespace OpenPerch.Runtime.Tests.Editor
         /// <summary>Interfaces the type itself adds on top of those of its base type.</summary>
         public string[] interfaces = Array.Empty<string>();
 
+        /// <summary>
+        /// Whether the type is marked <c>[Serializable]</c>. Recorded for classes and structs that do not derive from
+        /// <c>UnityEngine.Object</c>, because Unity silently skips fields of such a type without the attribute; false for
+        /// every other type.
+        /// </summary>
+        public bool serializable;
+
         /// <summary>Fields Unity serializes, in declaration order.</summary>
         public SchemaField[] fields = Array.Empty<SchemaField>();
 

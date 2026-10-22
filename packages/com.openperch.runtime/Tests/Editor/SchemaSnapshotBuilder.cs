@@ -30,6 +30,7 @@ namespace OpenPerch.Runtime.Tests.Editor
                 kind = KindOf(type),
                 baseType = type.BaseType == null ? "" : TypeName(type.BaseType),
                 interfaces = OwnInterfaces(type),
+                serializable = IsSerializableData(type),
                 fields = SerializedFields(type),
                 enumValues = EnumValues(type),
             };
@@ -82,6 +83,12 @@ namespace OpenPerch.Runtime.Tests.Editor
                 .Select(TypeName)
                 .OrderBy(n => n, StringComparer.Ordinal)
                 .ToArray();
+        }
+
+        private static bool IsSerializableData(Type type)
+        {
+            var plainData = (type.IsClass || (type.IsValueType && !type.IsEnum)) && !typeof(UnityEngine.Object).IsAssignableFrom(type);
+            return plainData && type.IsSerializable;
         }
 
         private static SchemaField[] SerializedFields(Type type)
