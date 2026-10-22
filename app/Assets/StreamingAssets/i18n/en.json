@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "lang": "en",
+  "entries": [
+    { "key": "common.ok", "text": "OK" },
+    { "key": "common.cancel", "text": "Cancel" },
+
+    { "key": "menu.avatars", "text": "Avatars" },
+    { "key": "menu.expressions", "text": "Expressions" },
+    { "key": "menu.gestures", "text": "Gestures" },
+    { "key": "menu.pomodoro", "text": "Pomodoro" },
+    { "key": "menu.displaySize", "text": "Display size" },
+    { "key": "menu.hideAvatar", "text": "Hide this avatar" },
+    { "key": "menu.monitor", "text": "Display monitor" },
+    { "key": "menu.settings", "text": "Settings" },
+    { "key": "menu.quit", "text": "Quit" },
+    { "key": "menu.back", "text": "Back" },
+
+    { "key": "start.title", "text": "Getting started" },
+    { "key": "start.step1", "text": "Add the exporter to your avatar project with VCC" },
+    { "key": "start.step2", "text": "Export your avatar from Unity" },
+    { "key": "start.step3", "text": "Import the exported file, or drop it here" },
+    { "key": "start.openGuide", "text": "Open the guide" },
+
+    { "key": "hints.title", "text": "Tips" },
+    { "key": "hints.rightClick", "text": "Right-click the avatar to open the menu." },
+    { "key": "hints.drag", "text": "Drag to pick it up, and let go to throw it." },
+    { "key": "hints.windowTop", "text": "Put it on top of a window and it walks and sits there." },
+    { "key": "hints.altPassThrough", "text": "Hold Alt to click through the avatar." },
+    { "key": "hints.tray", "text": "Settings and Quit are on the notification area icon." },
+
+    { "key": "settings.title", "text": "Settings" },
+    { "key": "settings.library", "text": "Library" },
+    { "key": "settings.avatar", "text": "Avatar" },
+    { "key": "settings.behavior", "text": "Behavior" },
+    { "key": "settings.pomodoro", "text": "Pomodoro" },
+    { "key": "settings.notifications", "text": "Notifications" },
+    { "key": "settings.language", "text": "Language" },
+    { "key": "settings.languageSystem", "text": "Same as Windows" },
+    { "key": "settings.fpsCap", "text": "Frame rate limit" },
+    { "key": "settings.autostart", "text": "Start with Windows" },
+    { "key": "settings.checkUpdates", "text": "Check for updates" },
+    { "key": "settings.data", "text": "Data" },
+    { "key": "settings.licenses", "text": "Licenses" },
+    { "key": "settings.diagnostics", "text": "Diagnostics" },
+
+    { "key": "params.title", "text": "Parameters" },
+    { "key": "params.internal", "text": "Internal parameters" },
+
+    { "key": "library.import", "text": "Import" },
+    { "key": "library.remove", "text": "Remove" },
+    { "key": "library.inUse", "text": "This avatar is on the desktop. Remove it from the desktop first." },
+    { "key": "library.needsReimport", "text": "The file is missing or damaged. Import it again." },
+
+    { "key": "import.untrustedTitle", "text": "This file came from somewhere else" },
+    { "key": "import.untrustedBody", "text": "{name} came from the internet or another computer. Only load files you exported yourself. Import it anyway?" },
+    { "key": "import.lineageTitle", "text": "Another export of the same avatar" },
+    { "key": "import.lineageBody", "text": "{name} is a new export of an avatar already in your library. What would you like to do?" },
+    { "key": "import.lineageReplace", "text": "Replace it as an update (keep its settings)" },
+    { "key": "import.lineageAddNew", "text": "Add it as a separate avatar" },
+    { "key": "import.elevated", "text": "Importing and loading are turned off while the app runs as administrator." },
+    { "key": "import.failed", "text": "The file could not be imported ({code})." },
+
+    { "key": "pomodoro.start", "text": "Start" },
+    { "key": "pomodoro.pause", "text": "Pause" },
+    { "key": "pomodoro.resume", "text": "Resume" },
+    { "key": "pomodoro.skip", "text": "Skip" },
+    { "key": "pomodoro.stop", "text": "Stop" },
+    { "key": "pomodoro.working", "text": "Working" },
+    { "key": "pomodoro.shortBreak", "text": "Short break" },
+    { "key": "pomodoro.longBreak", "text": "Long break" },
+    { "key": "pomodoro.workEnded", "text": "Work time is over. Take a break." },
+    { "key": "pomodoro.breakEnded", "text": "The break is over." },
+    { "key": "pomodoro.endedAgo", "text": "This ended {minutes} min ago." },
+
+    { "key": "balloon.noMotions", "text": "Import a motion pack and I will walk around." }
+  ]
+}
