@@ -68,6 +68,80 @@ namespace OpenPerch.Core.Tests.Behavior
             Assert.That(landed.FeetPx.y, Is.EqualTo(1040f));
         }
 
+        // The owner still finds the window by its handle and the feet x, but the feet were left at y = 600.
+        [TestCase(700, 700f)]
+        [TestCase(500, 1040f)]
+        public void FallsAfterUnhidingWhenTheWindowMovedWhileHidden(int movedToY, float landsAtY)
+        {
+            BrainHarness h = InState(MascotState.Idle);
+            h.Input.Fullscreen = true;
+            h.Step();
+            h.SetSurfaces(TestDesk.Snapshot(2, TestDesk.Window(101, movedToY, 400, 1000)));
+            Assert.That(h.Input.Standing.IsNone, Is.False);
+
+            h.Input.Fullscreen = false;
+            Assert.That(h.Steps(59).State, Is.EqualTo(MascotState.Hidden));
+            Assert.That(h.Step().State, Is.EqualTo(MascotState.Falling));
+
+            BrainOutput landed = h.StepUntil(o => o.State != MascotState.Falling);
+            Assert.That(landed.FeetPx.y, Is.EqualTo(landsAtY));
+        }
+
+        // The window still sits in the snapshot where it was, as it does right after the owner reports the loss.
+        [TestCase(true)]
+        [TestCase(false)]
+        public void FallsAfterUnhidingWhenTheFootingWasLostWhileHidden(bool lostBeforeTheConditionClears)
+        {
+            BrainHarness h = InState(MascotState.Idle);
+            h.Step();
+            h.Input.Fullscreen = true;
+            h.Step();
+            if (lostBeforeTheConditionClears)
+            {
+                h.Input.StandingLostHard = true;
+                h.Step();
+                h.Input.Fullscreen = false;
+            }
+            else
+            {
+                h.Input.Fullscreen = false;
+                h.Steps(10);
+                h.Input.StandingLostHard = true;
+            }
+
+            Assert.That(h.Steps(lostBeforeTheConditionClears ? 59 : 49).State, Is.EqualTo(MascotState.Hidden));
+            Assert.That(h.Step().State, Is.EqualTo(MascotState.Falling));
+
+            BrainOutput landed = h.StepUntil(o => o.State != MascotState.Falling);
+            Assert.That(landed.FeetPx.y, Is.EqualTo(1040f));
+        }
+
+        [Test]
+        public void HiddenFromTheFirstTickPlaysARoleThatHasAMotion()
+        {
+            var h = new BrainHarness(TestDesk.FixedDwell(1f), TestDesk.Desk(), new Vec2(700f, 600f), MotionAvailability.None, 0f);
+            h.Input.Fullscreen = true;
+
+            BrainOutput hidden = h.Step();
+
+            Assert.That(hidden.State, Is.EqualTo(MascotState.Hidden));
+            Assert.That(hidden.Role, Is.EqualTo(LocomotionRole.Idle));
+        }
+
+        [Test]
+        public void KeptRoleFallsBackWhenItsMotionGoesWhileHidden()
+        {
+            BrainHarness h = InState(MascotState.SitEdge);
+            h.Input.Fullscreen = true;
+            h.Step();
+
+            h.Input.Motions = MotionAvailability.Idle | MotionAvailability.Fall;
+            BrainOutput hidden = h.Step();
+
+            Assert.That(hidden.State, Is.EqualTo(MascotState.Hidden));
+            Assert.That(hidden.Role, Is.EqualTo(LocomotionRole.Idle));
+        }
+
         [Test]
         public void HidingAgainRestartsTheTwoSeconds()
         {

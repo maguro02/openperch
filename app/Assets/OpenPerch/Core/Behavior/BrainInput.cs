@@ -16,7 +16,8 @@ namespace OpenPerch.App.Core
 
         /// <summary>
         /// Surface under the feet within <see cref="Surfaces"/>, or <see cref="SurfaceRef.None"/> when the owner finds none.
-        /// Ignored while airborne or dragged; leaving <see cref="MascotState.Hidden"/> reads it to decide whether to fall.
+        /// The owner may find it by the window being stood on and the feet x alone. Ignored while airborne or dragged;
+        /// leaving <see cref="MascotState.Hidden"/> onto it also needs the feet near its <see cref="Surface.Y"/>.
         /// </summary>
         public SurfaceRef Standing;
 
@@ -31,7 +32,10 @@ namespace OpenPerch.App.Core
         /// <summary>The hit test puts this avatar under the cursor; false while Alt lets clicks pass through.</summary>
         public bool PointerOnThisAvatar;
 
-        /// <summary>The mascot has to stay hidden: a fullscreen app, hide-all, or a locked session.</summary>
+        /// <summary>
+        /// The mascot has to stay hidden: a fullscreen app, hide-all, or a locked session. The mascot shows again once
+        /// ticks adding up to 2 s have passed with this cleared, so the owner keeps ticking while the mascot is hidden.
+        /// </summary>
         public bool Fullscreen;
 
         /// <summary>An FX locomotion control disabled locomotion, so walking and jumping are not allowed.</summary>
@@ -39,7 +43,8 @@ namespace OpenPerch.App.Core
 
         /// <summary>
         /// The window being stood on was minimized, cloaked, destroyed, maximized, changed process, or moved further
-        /// than the owner follows.
+        /// than the owner follows. Set for the tick it is detected in; one detected while hidden still makes the mascot
+        /// fall when it shows again.
         /// </summary>
         public bool StandingLostHard;
 

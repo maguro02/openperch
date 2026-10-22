@@ -8,11 +8,19 @@ namespace OpenPerch.Core.Tests.Behavior
     /// Ticks a <see cref="MascotBrain"/> the way its owner does: fixed 30 Hz steps, the feet fed back, one-tick flags
     /// cleared, and the standing surface looked up under the feet after every tick.
     /// </summary>
+    /// <remarks>
+    /// Like the owner, it finds the surface just landed on by the feet, and from then on follows that window by its
+    /// handle and the feet x, whatever its y has become.
+    /// </remarks>
     internal sealed class BrainHarness
     {
         public const float Dt = 1f / 30f;
 
         public BrainInput Input;
+
+        private bool _following;
+        private IntPtr _followedOwner;
+        private SurfaceKind _followedKind;
 
         public BrainHarness(BehaviorConfig config, SurfaceSet surfaces, Vec2 feet, MotionAvailability motions, params float[] randomSequence)
         {
@@ -126,6 +134,7 @@ namespace OpenPerch.Core.Tests.Behavior
                 case MascotState.Falling:
                 case MascotState.Jump:
                 case MascotState.Dragged:
+                    _following = false;
                     return SurfaceRef.None;
             }
 
@@ -133,8 +142,12 @@ namespace OpenPerch.Core.Tests.Behavior
             for (int k = 0; k < set.Items.Length; k++)
             {
                 Surface s = set.Items[k];
-                if (Math.Abs(s.Y - feet.y) <= 0.5f && feet.x >= s.X0 && feet.x < s.X1)
+                bool candidate = _following ? s.Owner == _followedOwner && s.Kind == _followedKind : Math.Abs(s.Y - feet.y) <= 0.5f;
+                if (candidate && feet.x >= s.X0 && feet.x < s.X1)
                 {
+                    _following = true;
+                    _followedOwner = s.Owner;
+                    _followedKind = s.Kind;
                     return new SurfaceRef(k, set.Seq);
                 }
             }

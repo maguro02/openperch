@@ -8,8 +8,10 @@ namespace OpenPerch.App.Core
     /// <remarks>
     /// The owner ticks it at a fixed rate, feeds the returned <see cref="BrainOutput.FeetPx"/> back, and looks up
     /// <see cref="BrainInput.Standing"/> under the feet in the current surfaces. While dragged, the owner places the feet
-    /// from the cursor every frame; the brain only reacts to the press and the release. Coordinates are client pixels
-    /// with y pointing down, so gravity acts along +y.
+    /// from the cursor every frame; the brain only reacts to the press and the release. The owner keeps ticking while
+    /// <see cref="BrainInput.Fullscreen"/> holds the mascot hidden and for at least 2 s after it clears, because the
+    /// brain counts that delay in its own ticks before it shows the mascot again. Coordinates are client pixels with
+    /// y pointing down, so gravity acts along +y.
     /// </remarks>
     public sealed class MascotBrain
     {
@@ -22,6 +24,10 @@ namespace OpenPerch.App.Core
         // The landing is solved on the integrated path, so it misses the aimed point by rounding only; aiming this far
         // inside the span keeps a jump to its very end from landing just outside it.
         private const float JumpLandingInsetPx = 1f;
+
+        // The owner may look the surface up by window and x alone, so a window that moved while the mascot was hidden
+        // still resolves although the feet stayed behind. The slack covers a snapshot trailing a window being followed.
+        private const float UnhideFootingToleranceRatio = 0.05f;
 
         // Sums of 1/30 s steps drift by a few ulps; without the slack a 0.5 s threshold could take one tick more.
         private const float TimeEpsilon = 1e-4f;
@@ -42,6 +48,7 @@ namespace OpenPerch.App.Core
         private int _walkDirection = 1;
         private float _walkRemainingPx;
         private bool _variantPlaying;
+        private bool _lostWhileHidden;
         private bool _hasLastStanding;
         private IntPtr _lastStandingOwner;
         private int _lastStandingY;
@@ -105,8 +112,12 @@ namespace OpenPerch.App.Core
                 _stateTimer = 0f;
                 _velocity = default;
                 _variantPlaying = false;
+                _lostWhileHidden = false;
             }
-            else if (input.Fullscreen)
+
+            // The owner reports a hard loss for a single tick, so one that arrives while hidden has to wait for the exit.
+            _lostWhileHidden |= input.StandingLostHard;
+            if (input.Fullscreen)
             {
                 _stateTimer = 0f;
             }
@@ -116,12 +127,14 @@ namespace OpenPerch.App.Core
                 if (_stateTimer + TimeEpsilon >= UnhideDelaySec)
                 {
                     _footingLostSec = 0f;
-                    if (!input.StandingLostHard && TryGetFooting(input, out _))
+                    if (!_lostWhileHidden
+                        && TryGetFooting(input, out Surface standing)
+                        && Math.Abs(standing.Y - input.FeetPx.y) <= UnhideFootingToleranceRatio * input.DisplayHeightPx)
                     {
                         return EnterIdle(input, input.FeetPx);
                     }
 
-                    return EnterFalling(input, input.FeetPx, default, input.StandingLostHard);
+                    return EnterFalling(input, input.FeetPx, default, _lostWhileHidden);
                 }
             }
 
@@ -131,7 +144,7 @@ namespace OpenPerch.App.Core
                 FeetPx = input.FeetPx,
                 RootPx = input.FeetPx + (_last.RootPx - _last.FeetPx),
                 Facing = _last.Facing,
-                Role = _last.Role,
+                Role = ResolveRole(_last.Role, input.Motions),
                 RoleSpeed = 0f,
             };
         }
