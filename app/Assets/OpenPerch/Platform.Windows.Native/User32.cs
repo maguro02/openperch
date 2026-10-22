@@ -213,6 +213,10 @@ namespace OpenPerch.App.Platform.Windows.Native
         [DllImport(Dll, CharSet = CharSet.Unicode, ExactSpelling = true)]
         public static extern IntPtr GetForegroundWindow();
 
+        /// <remarks>
+        /// Fails for a window that draws itself through UpdateLayeredWindow, whose alpha varies per pixel; such a window
+        /// must not be taken for opaque.
+        /// </remarks>
         [DllImport(Dll, CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetLayeredWindowAttributes(IntPtr hwnd, out uint pcrKey, out byte pbAlpha, out uint pdwFlags);

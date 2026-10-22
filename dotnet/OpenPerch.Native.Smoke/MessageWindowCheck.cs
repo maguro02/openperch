@@ -102,6 +102,7 @@ namespace OpenPerch.Native.Smoke
 
         private static void DwmAttributes(SmokeReport report, IntPtr hwnd)
         {
+            User32.GetWindowRect(hwnd, out RECT window);
             int hr = Dwmapi.DwmGetWindowAttribute(hwnd, Dwmapi.DWMWA_EXTENDED_FRAME_BOUNDS, out RECT frame, RectSize);
             report.Require(
                 hr == Kernel32.S_OK && frame.right > frame.left && frame.bottom > frame.top,
@@ -110,8 +111,20 @@ namespace OpenPerch.Native.Smoke
             hr = Dwmapi.DwmGetWindowAttribute(hwnd, Dwmapi.DWMWA_CLOAKED, out uint cloaked, sizeof(uint));
             report.Require(hr == Kernel32.S_OK && cloaked == 0, $"DWMWA_CLOAKED is 0 for a shown window (hr 0x{hr:X8}, value {cloaked})");
 
+            // Offsetting by the extended frame's origin instead would push the buttons past its right edge by the width
+            // of the invisible resize border, so this pins which origin the attribute is relative to.
             hr = Dwmapi.DwmGetWindowAttribute(hwnd, Dwmapi.DWMWA_CAPTION_BUTTON_BOUNDS, out RECT caption, RectSize);
-            report.Require(hr == Kernel32.S_OK, $"DWMWA_CAPTION_BUTTON_BOUNDS returns {SmokeReport.Describe(caption)} (hr 0x{hr:X8})");
+            var onScreen = new RECT
+            {
+                left = window.left + caption.left,
+                top = window.top + caption.top,
+                right = window.left + caption.right,
+                bottom = window.top + caption.bottom,
+            };
+            report.Require(
+                hr == Kernel32.S_OK && caption.right > caption.left && caption.bottom > caption.top && Contains(frame, onScreen),
+                $"DWMWA_CAPTION_BUTTON_BOUNDS returns {SmokeReport.Describe(caption)}, which lies inside the extended frame bounds " +
+                $"once offset by the window rect's origin: {SmokeReport.Describe(onScreen)} (hr 0x{hr:X8})");
 
             uint corner = Dwmapi.DWMWCP_DONOTROUND;
             int cornerHr = Dwmapi.DwmSetWindowAttribute(hwnd, Dwmapi.DWMWA_WINDOW_CORNER_PREFERENCE, ref corner, sizeof(uint));
@@ -251,6 +264,9 @@ namespace OpenPerch.Native.Smoke
         }
 
         private static string Outcome(bool registered, int error) => registered ? "registered" : $"failed (error {error})";
+
+        private static bool Contains(RECT outer, RECT inner) =>
+            inner.left >= outer.left && inner.top >= outer.top && inner.right <= outer.right && inner.bottom <= outer.bottom;
 
         [MonoPInvokeCallback(typeof(WNDPROC))]
         private static IntPtr WndProc(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam)

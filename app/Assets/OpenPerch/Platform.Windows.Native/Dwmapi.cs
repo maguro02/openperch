@@ -10,7 +10,13 @@ namespace OpenPerch.App.Platform.Windows.Native
     {
         private const string Dll = "dwmapi.dll";
 
+        /// <summary>
+        /// Caption button bounds relative to the top-left of <see cref="User32.GetWindowRect"/>, not of the extended frame
+        /// bounds, whose left edge lies inside the invisible resize border. Undefined while the window is minimized,
+        /// cloaked or hidden.
+        /// </summary>
         public const uint DWMWA_CAPTION_BUTTON_BOUNDS = 5;
+
         public const uint DWMWA_EXTENDED_FRAME_BOUNDS = 9;
         public const uint DWMWA_CLOAKED = 14;
 
