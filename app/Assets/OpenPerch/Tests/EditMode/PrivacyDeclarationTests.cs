@@ -43,7 +43,7 @@ namespace OpenPerch.App.Tests.EditMode
         [Category("T-PRIV")]
         public void DeclarationsLiveOnlyInTheNativeAggregatorClasses()
         {
-            Assert.That(PInvokeAudit.FindMisplaced(PInvokeAudit.Collect(AppAssemblies())), Is.Empty);
+            Assert.That(PInvokeAudit.FindMisplaced(PInvokeAudit.Collect(AppAssemblies()), typeof(User32).Assembly), Is.Empty);
         }
 
         [Test]
