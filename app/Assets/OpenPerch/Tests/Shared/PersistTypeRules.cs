@@ -81,6 +81,8 @@ namespace OpenPerch.App.Tests.Shared
         private static string CheckFieldType(Type t, Queue<Type> queue)
         {
             if (IsScalar(t)) return null;
+            if (t.IsInterface) return "interface type " + t.Name;
+            if (t == typeof(object)) return "object type";
             if (t.IsArray)
             {
                 return t.GetArrayRank() == 1 ? CheckElementType(t.GetElementType(), queue) : "multi-dimensional array";
@@ -91,8 +93,6 @@ namespace OpenPerch.App.Tests.Shared
                     ? CheckElementType(t.GetGenericArguments()[0], queue)
                     : "unsupported generic type " + t.Name;
             }
-            if (t.IsInterface) return "interface type " + t.Name;
-            if (t == typeof(object)) return "object type";
             if (t.IsPointer || t.IsByRef || IsSystemType(t)) return "unsupported type " + t.FullName;
 
             queue.Enqueue(t);
