@@ -22,7 +22,11 @@ namespace OpenPerch.App.Editor
             Profile = profile;
         }
 
-        /// <summary><c>-opOut</c>: directory the player is written to. Relative paths are relative to the Unity project.</summary>
+        /// <summary>
+        /// <c>-opOut</c>: directory the player is written to, as given. The build resolves a relative path from the
+        /// repository root, so <c>out/…</c> lands in the git-ignored out folder, and refuses a folder inside the project's
+        /// Assets or Packages.
+        /// </summary>
         public string OutputDirectory { get; }
 
         /// <summary><c>-opVersion</c>: the app's SemVer.</summary>

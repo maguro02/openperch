@@ -17,8 +17,12 @@ namespace OpenPerch.App.Editor
     {
         /// <param name="assetPaths">Project paths of every asset that is not a folder.</param>
         /// <param name="declarationsPath">Absolute path of docs/asset-licenses.json.</param>
-        /// <returns>One message per undeclared file, or why the declarations could not be used.</returns>
-        public static List<string> FindProblems(IEnumerable<string> assetPaths, string declarationsPath)
+        /// <param name="projectFolder">Path of the Unity project from the repository root, such as <c>app</c>.</param>
+        /// <returns>
+        /// One message per undeclared file, or why the declarations could not be used. Files of the project are named by
+        /// their path from the repository root, the form the declarations use for them.
+        /// </returns>
+        public static List<string> FindProblems(IEnumerable<string> assetPaths, string declarationsPath, string projectFolder)
         {
             if (!File.Exists(declarationsPath))
             {
@@ -33,12 +37,28 @@ namespace OpenPerch.App.Editor
             }
 
             var declared = entries.Select(e => GlobToRegex(e.path)).ToList();
-            problems.AddRange(assetPaths
-                .Where(IsShippedRegardless)
-                .Where(p => !declared.Any(r => r.IsMatch(p)))
-                .OrderBy(p => p, StringComparer.Ordinal)
-                .Select(p => p + " ships with the player but is not declared in docs/asset-licenses.json."));
+            var undeclared = new List<string>();
+            foreach (var assetPath in assetPaths.Where(IsShippedRegardless))
+            {
+                var repositoryPath = RepositoryPath(assetPath, projectFolder);
+                if (!declared.Any(r => r.IsMatch(assetPath) || (repositoryPath != null && r.IsMatch(repositoryPath))))
+                {
+                    undeclared.Add(repositoryPath ?? assetPath);
+                }
+            }
+
+            undeclared.Sort(StringComparer.Ordinal);
+            problems.AddRange(undeclared.Select(p => p + " ships with the player but is not declared in docs/asset-licenses.json."));
             return problems;
+        }
+
+        /// <summary>
+        /// The path from the repository root of a file in the project's Assets folder, or null for a package file: the
+        /// Package Manager keeps cached packages in the project's Library, so they have no path in the repository.
+        /// </summary>
+        private static string RepositoryPath(string assetPath, string projectFolder)
+        {
+            return assetPath.StartsWith("Assets/", StringComparison.Ordinal) ? projectFolder + "/" + assetPath : null;
         }
 
         private static bool IsShippedRegardless(string assetPath)

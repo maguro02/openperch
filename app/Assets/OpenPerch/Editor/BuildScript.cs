@@ -67,8 +67,10 @@ namespace OpenPerch.App.Editor
 
             var problems = new List<string>();
             problems.AddRange(CheckEditor(arguments.Profile));
+            var outputDirectory = ResolveOutputDirectory(arguments.OutputDirectory, repositoryRoot, projectRoot, problems);
             problems.AddRange(BuiltinModuleCheck.FindProblems(Path.Combine(projectRoot, "Packages", "manifest.json")));
-            problems.AddRange(AssetLicenseAudit.FindProblems(assetPaths, Path.Combine(repositoryRoot, "docs", "asset-licenses.json")));
+            problems.AddRange(AssetLicenseAudit.FindProblems(
+                assetPaths, Path.Combine(repositoryRoot, "docs", "asset-licenses.json"), Path.GetFileName(projectRoot)));
             problems.AddRange(TmpEssentialsAudit.FindProblems(assetPaths));
             problems.AddRange(MissingLicenseFiles(repositoryRoot));
             if (scenes.Length == 0)
@@ -90,7 +92,6 @@ namespace OpenPerch.App.Editor
             }
 
             PlayerSettings.bundleVersion = arguments.Version;
-            var outputDirectory = Path.GetFullPath(arguments.OutputDirectory);
             Directory.CreateDirectory(outputDirectory);
             if (!BuildPlayer(arguments, scenes, Path.Combine(outputDirectory, PlayerFileName)))
             {
@@ -114,6 +115,37 @@ namespace OpenPerch.App.Editor
             {
                 yield return "Windows Build Support (Mono) is not installed for this editor.";
             }
+        }
+
+        /// <summary>
+        /// Resolves <paramref name="requested"/> from the repository root when it is relative, and reports a folder Unity
+        /// would import. The editor's working folder is the project, where a relative <c>out/…</c> would leave the player
+        /// untracked next to the sources instead of in the git-ignored out folder.
+        /// </summary>
+        private static string ResolveOutputDirectory(string requested, string repositoryRoot, string projectRoot, List<string> problems)
+        {
+            var resolved = Path.GetFullPath(Path.Combine(repositoryRoot, requested));
+            foreach (var imported in new[] { "Assets", "Packages" })
+            {
+                if (IsSameOrInside(resolved, Path.Combine(projectRoot, imported)))
+                {
+                    problems.Add("-opOut " + requested + " is inside the project's " + imported +
+                        " folder, where Unity would import the player.");
+                }
+            }
+
+            return resolved;
+        }
+
+        private static bool IsSameOrInside(string path, string folder)
+        {
+            // Case-insensitive, as the file systems of macOS and Windows are by default; refusing too much is harmless here.
+            return WithTrailingSeparator(path).StartsWith(WithTrailingSeparator(folder), StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string WithTrailingSeparator(string path)
+        {
+            return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
         }
 
         private static bool BuildPlayer(BuildArguments arguments, string[] scenes, string playerPath)
