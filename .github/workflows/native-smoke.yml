@@ -23,3 +23,10 @@ jobs:
         run: dotnet run --project dotnet/OpenPerch.Native.Smoke/OpenPerch.Native.Smoke.csproj -c Release
       - name: Build EnvDriver
         run: dotnet build dotnet/OpenPerch.EnvDriver/OpenPerch.EnvDriver.csproj -c Release
+      # The tools are run on the development machine only, so CI checks that they at least parse in both PowerShell editions.
+      - name: Parse tools (PowerShell 7)
+        shell: pwsh
+        run: ./tools/check-powershell-syntax.ps1
+      - name: Parse tools (Windows PowerShell 5.1)
+        shell: powershell
+        run: ./tools/check-powershell-syntax.ps1

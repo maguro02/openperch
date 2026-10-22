@@ -13,7 +13,12 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Windows as well: the stores rely on File.Replace and other file-system semantics that differ from Linux.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
