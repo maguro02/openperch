@@ -16,6 +16,13 @@ namespace OpenPerch.App.Editor
         private const string TestSupportDefine = "OPENPERCH_TEST_SUPPORT";
         private const string PlayerFileName = "OpenPerch.exe";
 
+        // Batch mode opens the project in whichever patch it is started with, so the patch is checked here. The app's
+        // compatibility checks assume this exact player version, and older 2022.3 patches lack the fix for CVE-2025-59489.
+        private const string U2022Editor = "2022.3.62f3";
+
+        // No 6000.3 patch has been chosen for the app yet, so the U6000 profile refuses to build until one is set here.
+        private const string U6000Editor = null;
+
         /// <summary>
         /// Entry point of
         /// <c>-executeMethod OpenPerch.App.Editor.BuildScript.BuildWindowsCli -opOut &lt;dir&gt; -opVersion &lt;semver&gt; [-opDev] [-opProfile U2022|U6000]</c>.
@@ -65,6 +72,7 @@ namespace OpenPerch.App.Editor
             var assetPaths = AssetDatabase.GetAllAssetPaths().Where(p => !AssetDatabase.IsValidFolder(p)).ToList();
             var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
 
+            // Every check runs before the first setting is changed, so a build refused by a check leaves the project as it was.
             var problems = new List<string>();
             problems.AddRange(CheckEditor(arguments.Profile));
             var outputDirectory = ResolveOutputDirectory(arguments.OutputDirectory, repositoryRoot, projectRoot, problems);
@@ -73,6 +81,9 @@ namespace OpenPerch.App.Editor
                 assetPaths, Path.Combine(repositoryRoot, "docs", "asset-licenses.json"), Path.GetFileName(projectRoot)));
             problems.AddRange(TmpEssentialsAudit.FindProblems(assetPaths));
             problems.AddRange(MissingLicenseFiles(repositoryRoot));
+            problems.AddRange(PlayerSettingsEnforcer.FindProblems());
+            problems.AddRange(QualitySettingsEnforcer.FindProblems());
+            problems.AddRange(GraphicsSettingsEnforcer.FindProblems());
             if (scenes.Length == 0)
             {
                 problems.Add("No scene is enabled in File > Build Settings.");
@@ -83,15 +94,11 @@ namespace OpenPerch.App.Editor
                 return Fail(problems);
             }
 
-            problems.AddRange(PlayerSettingsEnforcer.Apply(arguments.Profile));
-            problems.AddRange(QualitySettingsEnforcer.Apply());
-            problems.AddRange(GraphicsSettingsEnforcer.Apply());
-            if (problems.Count > 0)
-            {
-                return Fail(problems);
-            }
-
+            PlayerSettingsEnforcer.Apply(arguments.Profile);
+            QualitySettingsEnforcer.Apply();
+            GraphicsSettingsEnforcer.Apply();
             PlayerSettings.bundleVersion = arguments.Version;
+
             Directory.CreateDirectory(outputDirectory);
             if (!BuildPlayer(arguments, scenes, Path.Combine(outputDirectory, PlayerFileName)))
             {
@@ -105,10 +112,15 @@ namespace OpenPerch.App.Editor
 
         private static IEnumerable<string> CheckEditor(BuildProfile profile)
         {
-            var stream = profile == BuildProfile.U6000 ? "6000.3." : "2022.3.";
-            if (!Application.unityVersion.StartsWith(stream, StringComparison.Ordinal))
+            var required = profile == BuildProfile.U6000 ? U6000Editor : U2022Editor;
+            if (required == null)
             {
-                yield return "Profile " + profile + " builds with Unity " + stream + "x, but this editor is " + Application.unityVersion + ".";
+                yield return "Profile " + profile + " has no Unity patch pinned in BuildScript yet, so it cannot build.";
+            }
+            else if (Application.unityVersion != required)
+            {
+                yield return "Profile " + profile + " builds with Unity " + required + " only, but this editor is " +
+                    Application.unityVersion + ".";
             }
 
             if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64))

@@ -16,8 +16,9 @@ namespace OpenPerch.App.Editor
         // setting, so it is written through the serialized PlayerSettings object.
         private const int InputManagerOld = 0;
 
-        /// <returns>Problems that stopped the settings from being applied; empty when everything was applied.</returns>
-        public static List<string> Apply(BuildProfile profile)
+        /// <summary>Checks, without changing anything, what would stop <see cref="Apply"/> from forcing the settings.</summary>
+        /// <returns>One message per problem; empty when <see cref="Apply"/> can run.</returns>
+        public static List<string> FindProblems()
         {
             var problems = new List<string>();
             if (!string.IsNullOrEmpty(CloudProjectSettings.projectId))
@@ -26,19 +27,20 @@ namespace OpenPerch.App.Editor
                     "; unlink it in Project Settings > Services.");
             }
 
-            var inputHandler = FindPlayerSettingsProperty("activeInputHandler");
-            if (inputHandler == null)
+            if (FindPlayerSettingsProperty("activeInputHandler") == null)
             {
                 problems.Add("PlayerSettings has no activeInputHandler property, so Input Manager (Old) cannot be forced.");
             }
 
-            if (problems.Count > 0)
-            {
-                return problems;
-            }
+            return problems;
+        }
 
+        /// <summary>Forces the settings. Call only when <see cref="FindProblems"/> found nothing.</summary>
+        public static void Apply(BuildProfile profile)
+        {
             // Applied before the static setters below, which change the same object; applying this SerializedObject
             // afterwards could write its older copy of their values back.
+            var inputHandler = FindPlayerSettingsProperty("activeInputHandler");
             inputHandler.intValue = InputManagerOld;
             inputHandler.serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
@@ -70,8 +72,6 @@ namespace OpenPerch.App.Editor
             {
                 PlayerSettings.SplashScreen.show = false;
             }
-
-            return problems;
         }
 
         private static SerializedProperty FindPlayerSettingsProperty(string name)

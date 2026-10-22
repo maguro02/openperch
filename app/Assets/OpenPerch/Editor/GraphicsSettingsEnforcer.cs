@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -25,37 +26,31 @@ namespace OpenPerch.App.Editor
 
         private static readonly GraphicsTier[] Tiers = { GraphicsTier.Tier1, GraphicsTier.Tier2, GraphicsTier.Tier3 };
 
-        /// <returns>Problems that stopped the settings from being applied; empty when everything was applied.</returns>
-        public static List<string> Apply()
+        /// <summary>Checks, without changing anything, what would stop <see cref="Apply"/> from forcing the settings.</summary>
+        /// <returns>One message per problem; empty when <see cref="Apply"/> can run.</returns>
+        public static List<string> FindProblems()
         {
-            var problems = new List<string>();
-            var shaders = new Shader[AlwaysIncludedShaders.Length];
-            for (var i = 0; i < shaders.Length; i++)
-            {
-                shaders[i] = Shader.Find(AlwaysIncludedShaders[i]);
-                if (shaders[i] == null)
-                {
-                    problems.Add("Shader \"" + AlwaysIncludedShaders[i] + "\" was not found, so it cannot be always included.");
-                }
-            }
-
-            // The always-included list has no public API; it is edited through the serialized GraphicsSettings object.
-            var graphicsSettings = new SerializedObject(GraphicsSettings.GetGraphicsSettings());
-            var alwaysIncluded = graphicsSettings.FindProperty("m_AlwaysIncludedShaders");
-            if (alwaysIncluded == null || !alwaysIncluded.isArray)
+            var problems = AlwaysIncludedShaders
+                .Where(name => Shader.Find(name) == null)
+                .Select(name => "Shader \"" + name + "\" was not found, so it cannot be always included.")
+                .ToList();
+            if (AlwaysIncludedList(new SerializedObject(GraphicsSettings.GetGraphicsSettings())) == null)
             {
                 problems.Add("GraphicsSettings has no m_AlwaysIncludedShaders list.");
             }
 
-            if (problems.Count > 0)
-            {
-                return problems;
-            }
+            return problems;
+        }
 
-            alwaysIncluded.arraySize = shaders.Length;
-            for (var i = 0; i < shaders.Length; i++)
+        /// <summary>Forces the settings. Call only when <see cref="FindProblems"/> found nothing.</summary>
+        public static void Apply()
+        {
+            var graphicsSettings = new SerializedObject(GraphicsSettings.GetGraphicsSettings());
+            var alwaysIncluded = AlwaysIncludedList(graphicsSettings);
+            alwaysIncluded.arraySize = AlwaysIncludedShaders.Length;
+            for (var i = 0; i < AlwaysIncludedShaders.Length; i++)
             {
-                alwaysIncluded.GetArrayElementAtIndex(i).objectReferenceValue = shaders[i];
+                alwaysIncluded.GetArrayElementAtIndex(i).objectReferenceValue = Shader.Find(AlwaysIncludedShaders[i]);
             }
 
             // Applied before the static setters below, which change the same object; applying this SerializedObject
@@ -70,8 +65,13 @@ namespace OpenPerch.App.Editor
                 settings.hdrMode = CameraHDRMode.FP16;
                 EditorGraphicsSettings.SetTierSettings(BuildTargetGroup.Standalone, tier, settings);
             }
+        }
 
-            return problems;
+        // The always-included list has no public API; it is edited through the serialized GraphicsSettings object.
+        private static SerializedProperty AlwaysIncludedList(SerializedObject graphicsSettings)
+        {
+            var list = graphicsSettings.FindProperty("m_AlwaysIncludedShaders");
+            return list != null && list.isArray ? list : null;
         }
     }
 }
