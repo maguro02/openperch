@@ -8,7 +8,7 @@ namespace OpenPerch.Core.Tests.Menu
     {
         public static FakeTimeSource Clock() => new FakeTimeSource(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), 10);
 
-        public static ExpressionMenuController Controller(RecordingParamSink sink, params ExpressionMenuPage[] pages) =>
+        public static ExpressionMenuController Controller(IParamSink sink, params ExpressionMenuPage[] pages) =>
             new ExpressionMenuController(pages, sink, Clock());
 
         public static ExpressionMenuPage Page(params ExpressionMenuControl[] controls) =>

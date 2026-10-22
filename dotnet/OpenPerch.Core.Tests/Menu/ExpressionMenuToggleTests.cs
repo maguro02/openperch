@@ -34,6 +34,24 @@ namespace OpenPerch.Core.Tests.Menu
         }
 
         [Test]
+        public void ABoolParameterSwitchesOnAndOffWithAValueOfOne()
+        {
+            var sink = new BoolParamSink();
+            var menu = Controller(sink, Page(Toggle("Hat", 1f)));
+
+            Assert.That(menu.Press(0), Is.True);
+            Assert.That(menu.IsOn(0), Is.True);
+
+            Assert.That(menu.Press(0), Is.True);
+            Assert.That(menu.IsOn(0), Is.False);
+            Assert.That(sink.TryGet("Hat", out var off), Is.True);
+            Assert.That(off, Is.EqualTo(0f));
+
+            Assert.That(menu.Press(0), Is.True);
+            Assert.That(menu.IsOn(0), Is.True);
+        }
+
+        [Test]
         public void PressTurnsOnWhenTheParameterHoldsAnotherValue()
         {
             var sink = new RecordingParamSink();

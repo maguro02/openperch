@@ -10,7 +10,8 @@ namespace OpenPerch.App.Core
     /// <remarks>
     /// <para>
     /// Page 0 is the root. Values reach the <see cref="IParamSink"/> as plain floats: converting them to the declared type of the FX
-    /// parameter and clamping expression values is the sink's job. The controller itself clamps only puppet input.
+    /// parameter and clamping expression values is the sink's job. The controller itself clamps only puppet input. A toggle reads
+    /// its parameter back through the sink, so <see cref="IsOn"/> relies on that conversion leaving the toggle's value unchanged.
     /// </para>
     /// <para>
     /// The pages are read as given and must not be modified while the controller is in use. Call <see cref="Update"/> every frame,
@@ -95,9 +96,14 @@ namespace OpenPerch.App.Core
         }
 
         /// <summary>
-        /// Whether the toggle at <paramref name="index"/> shows as on, which is when its parameter currently equals its value,
-        /// whoever wrote it. Always false for other kinds of control.
+        /// Whether the toggle at <paramref name="index"/> shows as on, which is when its parameter currently reads back from the
+        /// sink as exactly its value, whoever wrote it. Always false for other kinds of control.
         /// </summary>
+        /// <remarks>
+        /// The comparison is exact, so the toggle's <see cref="ExpressionMenuControl.Value"/> must be one the parameter's
+        /// declared type can hold. If the sink's conversion changes it, the toggle never shows as on, and pressing it writes the
+        /// value again instead of turning it off.
+        /// </remarks>
         public bool IsOn(int index)
         {
             var control = GetControl(index);

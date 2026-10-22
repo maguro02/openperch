@@ -16,6 +16,11 @@ namespace OpenPerch.App.Core
         /// </summary>
         public string Parameter = "";
 
+        /// <summary>
+        /// What a button, toggle or sub-menu writes to <see cref="Parameter"/>. It must be a value the parameter's declared type
+        /// can hold, such as 0 or 1 for a Bool, a whole number from 0 to 255 for an Int, or a number from -1 to 1 for a Float, so
+        /// that the parameter reads back as exactly this value: a toggle shows as on only while it does.
+        /// </summary>
         public float Value;
 
         /// <summary>
