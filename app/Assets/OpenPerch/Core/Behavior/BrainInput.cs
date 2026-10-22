@@ -21,6 +21,7 @@ namespace OpenPerch.App.Core
         /// </summary>
         public SurfaceRef Standing;
 
+        /// <summary>Surfaces computed from the latest desktop snapshot.</summary>
         public SurfaceSet Surfaces;
 
         /// <summary>
@@ -48,8 +49,10 @@ namespace OpenPerch.App.Core
         /// </summary>
         public bool StandingLostHard;
 
+        /// <summary>Roles that the imported motions cover.</summary>
         public MotionAvailability Motions;
 
+        /// <summary>Current pomodoro mode, which reweights the idle decision.</summary>
         public PomodoroMode Pomodoro;
 
         /// <summary>Walking speed in pixels per second.</summary>

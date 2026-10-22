@@ -5,6 +5,7 @@ namespace OpenPerch.App.Core
     /// </summary>
     public struct BrainOutput
     {
+        /// <summary>State after this tick.</summary>
         public MascotState State;
 
         /// <summary>Feet position, to be fed back as the next <see cref="BrainInput.FeetPx"/>.</summary>
