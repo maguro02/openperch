@@ -137,6 +137,29 @@ namespace OpenPerch.Core.Tests.Menu
         }
 
         [Test]
+        public void BackInsideASubMenuClosesOnlyThePuppet()
+        {
+            var sink = new RecordingParamSink();
+            var menu = Controller(sink,
+                Page(SubMenu(1, "Outer", 1f)),
+                Page(Puppet(ExpressionMenuControlType.RadialPuppet, "SizeOpen", "Size")));
+            menu.Press(0);
+            menu.Press(0);
+
+            Assert.That(menu.Back(), Is.True);
+
+            Assert.That(menu.ActivePuppet, Is.Null);
+            Assert.That(menu.Depth, Is.EqualTo(1));
+            Assert.That(menu.CurrentPageIndex, Is.EqualTo(1));
+            Assert.That(sink.Writes, Is.EqualTo(new[] { "Outer=1", "SizeOpen=1", "SizeOpen=0" }));
+
+            Assert.That(menu.Back(), Is.True);
+
+            Assert.That(menu.Depth, Is.EqualTo(0));
+            Assert.That(sink.Writes, Is.EqualTo(new[] { "Outer=1", "SizeOpen=1", "SizeOpen=0", "Outer=0" }));
+        }
+
+        [Test]
         public void OtherControlsCannotBePressedWhileAPuppetIsOpen()
         {
             var sink = new RecordingParamSink();
