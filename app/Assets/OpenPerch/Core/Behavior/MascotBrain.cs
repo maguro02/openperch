@@ -47,6 +47,7 @@ namespace OpenPerch.App.Core
         private float _footingLostSec;
         private int _walkDirection = 1;
         private float _walkRemainingPx;
+        private bool _walkOffEnd;
         private bool _variantPlaying;
         private bool _lostWhileHidden;
         private bool _hasLastStanding;
@@ -380,7 +381,7 @@ namespace OpenPerch.App.Core
             if (input.Pomodoro == PomodoroMode.Focus && standing.Kind == SurfaceKind.WindowTop && canWalk)
             {
                 int towardNearerEnd = feet.x - standing.X0 < standing.X1 - feet.x ? -1 : 1;
-                return EnterWalk(input, feet, towardNearerEnd, float.PositiveInfinity);
+                return EnterWalk(input, feet, towardNearerEnd, float.PositiveInfinity, true);
             }
 
             switch (DrawAction(input.Pomodoro))
@@ -390,7 +391,7 @@ namespace OpenPerch.App.Core
                     {
                         int direction = _random.Next01() < 0.5f ? -1 : 1;
                         float ratio = Lerp(_config.walkMinRatio, _config.walkMaxRatio, _random.Next01());
-                        return EnterWalk(input, feet, direction, ratio * input.DisplayHeightPx);
+                        return EnterWalk(input, feet, direction, ratio * input.DisplayHeightPx, false);
                     }
 
                     break;
@@ -448,11 +449,12 @@ namespace OpenPerch.App.Core
             return r < jump ? ActionJump : ActionIdle;
         }
 
-        private BrainOutput EnterWalk(in BrainInput input, Vec2 feet, int direction, float distancePx)
+        private BrainOutput EnterWalk(in BrainInput input, Vec2 feet, int direction, float distancePx, bool offTheEnd)
         {
             _state = MascotState.Walk;
             _walkDirection = direction;
             _walkRemainingPx = distancePx;
+            _walkOffEnd = offTheEnd;
             return GroundedOutput(input, feet);
         }
 
@@ -468,7 +470,14 @@ namespace OpenPerch.App.Core
             feet.x += _walkDirection * step;
             if (footing)
             {
-                if (standing.Kind == SurfaceKind.Floor)
+                if (_walkOffEnd)
+                {
+                    if (feet.x < standing.X0 || feet.x >= standing.X1)
+                    {
+                        return EnterFalling(input, feet, new Vec2(_walkDirection * input.WalkSpeedPx, 0f), false);
+                    }
+                }
+                else
                 {
                     float lo = standing.X0;
                     float hi = standing.X1 - 1;
@@ -482,10 +491,6 @@ namespace OpenPerch.App.Core
                         feet.x = Math.Min(hi, 2f * lo - feet.x);
                         _walkDirection = 1;
                     }
-                }
-                else if (feet.x < standing.X0 || feet.x >= standing.X1)
-                {
-                    return EnterFalling(input, feet, new Vec2(_walkDirection * input.WalkSpeedPx, 0f), false);
                 }
             }
 

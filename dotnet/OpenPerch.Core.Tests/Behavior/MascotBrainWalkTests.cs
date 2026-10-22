@@ -56,22 +56,29 @@ namespace OpenPerch.Core.Tests.Behavior
         }
 
         [Test]
-        public void FallsAfterWalkingPastTheEndOfAWindowTop()
+        public void TurnsAroundAtTheEndOfAWindowTop()
         {
             var h = new BrainHarness(
                 TestDesk.FixedDwell(1f), TestDesk.Desk(TestDesk.Window(101, 600, 400, 1000)), new Vec2(950f, 600f), Walking, WalkRight342);
             h.Settle();
             Assert.That(h.Steps(30).State, Is.EqualTo(MascotState.Walk));
 
-            BrainOutput off = h.StepUntil(o => o.State != MascotState.Walk);
-            Assert.That(off.State, Is.EqualTo(MascotState.Falling));
-            Assert.That(off.FeetPx.x, Is.InRange(1000f, 1005f));
-            Assert.That(off.Facing, Is.EqualTo(1));
-            Assert.That(off.Role, Is.EqualTo(LocomotionRole.Fall));
+            float rightmost = 0f;
+            bool turned = false;
+            BrainOutput o = h.Step();
+            while (o.State == MascotState.Walk)
+            {
+                rightmost = Math.Max(rightmost, o.FeetPx.x);
+                turned |= o.Facing == -1;
+                o = h.Step();
+            }
 
-            BrainOutput landed = h.StepUntil(o => o.State != MascotState.Falling);
-            Assert.That(landed.FeetPx.y, Is.EqualTo(1040f));
-            Assert.That(landed.FeetPx.x, Is.GreaterThan(1050f));
+            Assert.That(o.State, Is.EqualTo(MascotState.Idle));
+            Assert.That(rightmost, Is.InRange(994f, 999f));
+            Assert.That(turned, Is.True);
+            // 49 px to the last pixel of the span, then the remaining 293 px back.
+            Assert.That(o.FeetPx.x, Is.EqualTo(706f).Within(0.05f));
+            Assert.That(o.FeetPx.y, Is.EqualTo(600f));
         }
 
         [Test]
