@@ -12,7 +12,8 @@ namespace OpenPerch.Core.Tests.Settings
         [Test]
         public void PersistedTypesFollowTheRules()
         {
-            var violations = PersistTypeRules.Check(typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile));
+            var violations = PersistTypeRules.Check(
+                typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile), typeof(RectI), typeof(Vec2), typeof(Vec2I));
 
             Assert.That(violations, Is.Empty);
         }
@@ -20,26 +21,34 @@ namespace OpenPerch.Core.Tests.Settings
         [Test]
         public void WalkReachesEveryNestedType()
         {
-            var types = PersistTypeRules.ReachableTypes(typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile));
+            var types = PersistTypeRules.ReachableTypes(
+                typeof(AppSettings), typeof(LibraryIndex), typeof(LocaleFile), typeof(RectI), typeof(Vec2), typeof(Vec2I));
 
             var expected = new[]
             {
                 typeof(AppSettings), typeof(AvatarPlacement), typeof(SavedParam), typeof(PomodoroParamBinding),
                 typeof(PomodoroConfig), typeof(NotificationSettings), typeof(BehaviorConfig), typeof(DynamicsMotionSettings),
                 typeof(Vec2I), typeof(LibraryIndex), typeof(LibraryEntry), typeof(LocaleFile), typeof(LocaleEntry),
+                typeof(RectI), typeof(Vec2),
             };
             Assert.That(expected.Except(types), Is.Empty);
         }
 
         [TestCase("RuleBreakingSample.frozen: readonly field")]
         [TestCase("RuleBreakingSample.lookup: unsupported generic type Dictionary`2")]
+        [TestCase("RuleBreakingSample.unique: unsupported generic type HashSet`1")]
         [TestCase("RuleBreakingSample.abstractList: interface type IList`1")]
         [TestCase("OpenSample: class is not sealed")]
+        [TestCase("DerivedSample: derives from OpenSample")]
+        [TestCase("NoDefaultConstructorSample: no public parameterless constructor")]
         [TestCase("UnserializableSample: not [Serializable]")]
         [TestCase("FrozenPoint.x: readonly field")]
         [TestCase("RuleBreakingSample.when: unsupported type System.DateTime")]
         [TestCase("RuleBreakingSample.anything: object type")]
         [TestCase("RuleBreakingSample.nested: nested collection")]
+        [TestCase("RuleBreakingSample.grid: multi-dimensional array")]
+        [TestCase("RuleBreakingSample.maybe: unsupported generic type Nullable`1")]
+        [TestCase("RuleBreakingSample.wide: enum wider than 32 bits")]
         [TestCase("RuleBreakingSample.missing: null in a default instance")]
         [TestCase("RuleBreakingSample._hidden: non-public field")]
         [TestCase("RuleBreakingSample.Count: property")]

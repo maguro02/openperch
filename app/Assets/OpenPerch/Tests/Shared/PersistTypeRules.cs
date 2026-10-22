@@ -7,8 +7,9 @@ namespace OpenPerch.App.Tests.Shared
     /// <summary>
     /// Reflection check of the rules for persisted types. Every class or struct reachable from the roots through fields must
     /// be <c>[Serializable]</c>, keep its data in public, non-readonly fields of types both JsonUtility and System.Text.Json
-    /// handle the same way (no dictionaries, sets, interfaces, <c>object</c> or nested collections), be a sealed class or a
-    /// struct, and have no null reference fields in a default instance. Only instance members are inspected.
+    /// handle the same way (no dictionaries, sets, interfaces, <c>object</c>, nested collections or enums wider than 32
+    /// bits), be a sealed class that derives from nothing else, or a struct, and have no null reference fields in a default
+    /// instance. Only instance members are inspected.
     /// </summary>
     public static class PersistTypeRules
     {
@@ -80,6 +81,7 @@ namespace OpenPerch.App.Tests.Shared
 
         private static string CheckFieldType(Type t, Queue<Type> queue)
         {
+            if (t.IsEnum) return IsWiderThan32Bits(Enum.GetUnderlyingType(t)) ? "enum wider than 32 bits" : null;
             if (IsScalar(t)) return null;
             if (t.IsInterface) return "interface type " + t.Name;
             if (t == typeof(object)) return "object type";
@@ -146,7 +148,10 @@ namespace OpenPerch.App.Tests.Shared
         private static bool IsScalar(Type t) =>
             t == typeof(bool) || t == typeof(byte) || t == typeof(sbyte) || t == typeof(short) || t == typeof(ushort) ||
             t == typeof(int) || t == typeof(uint) || t == typeof(long) || t == typeof(ulong) ||
-            t == typeof(float) || t == typeof(double) || t == typeof(string) || t.IsEnum;
+            t == typeof(float) || t == typeof(double) || t == typeof(string);
+
+        // Unity serializes enums of 32 bits or less only, and drops a field of a wider enum without an error.
+        private static bool IsWiderThan32Bits(Type underlying) => underlying == typeof(long) || underlying == typeof(ulong);
 
         // char, decimal, DateTime, Guid and the like are written differently by the two codecs, or not at all by JsonUtility.
         private static bool IsSystemType(Type t) =>
