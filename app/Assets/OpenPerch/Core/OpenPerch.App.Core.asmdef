@@ -1,0 +1,16 @@
+{
+  "name": "OpenPerch.App.Core",
+  "rootNamespace": "OpenPerch.App.Core",
+  "references": [
+    "OpenPerch.Format"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

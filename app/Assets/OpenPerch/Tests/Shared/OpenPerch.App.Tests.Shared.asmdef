@@ -1,0 +1,17 @@
+{
+  "name": "OpenPerch.App.Tests.Shared",
+  "rootNamespace": "OpenPerch.App.Tests.Shared",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Format"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

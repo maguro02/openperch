@@ -1,0 +1,25 @@
+name: native-smoke
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Native smoke
+        run: dotnet run --project dotnet/OpenPerch.Native.Smoke/OpenPerch.Native.Smoke.csproj -c Release
+      - name: Build EnvDriver
+        run: dotnet build dotnet/OpenPerch.EnvDriver/OpenPerch.EnvDriver.csproj -c Release

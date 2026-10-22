@@ -1,0 +1,22 @@
+{
+  "name": "OpenPerch.App.UI",
+  "rootNamespace": "OpenPerch.App.UI",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Format",
+    "OpenPerch.Runtime",
+    "OpenPerch.App.Mascot",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro",
+    "UniTask"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

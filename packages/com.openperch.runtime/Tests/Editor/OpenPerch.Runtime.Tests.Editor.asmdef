@@ -1,0 +1,26 @@
+{
+  "name": "OpenPerch.Runtime.Tests.Editor",
+  "rootNamespace": "OpenPerch.Runtime.Tests.Editor",
+  "references": [
+    "OpenPerch.Runtime",
+    "OpenPerch.Format",
+    "OpenPerch.Format.Json",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

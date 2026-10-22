@@ -1,0 +1,27 @@
+{
+  "name": "OpenPerch.Exporter.Tests",
+  "rootNamespace": "OpenPerch.Exporter.Tests",
+  "references": [
+    "OpenPerch.Exporter.Core",
+    "OpenPerch.Runtime",
+    "OpenPerch.Format",
+    "OpenPerch.Format.Json",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

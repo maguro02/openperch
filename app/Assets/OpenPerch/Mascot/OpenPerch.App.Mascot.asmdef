@@ -1,0 +1,24 @@
+{
+  "name": "OpenPerch.App.Mascot",
+  "rootNamespace": "OpenPerch.App.Mascot",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Format",
+    "OpenPerch.Runtime",
+    "OpenPerch.App.Platform.Windows",
+    "OpenPerch.App.Loading",
+    "OpenPerch.App.Rendering",
+    "OpenPerch.App.Animation",
+    "OpenPerch.App.Dynamics",
+    "UniTask"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

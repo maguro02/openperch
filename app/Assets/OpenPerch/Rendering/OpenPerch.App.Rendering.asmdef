@@ -1,0 +1,17 @@
+{
+  "name": "OpenPerch.App.Rendering",
+  "rootNamespace": "OpenPerch.App.Rendering",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

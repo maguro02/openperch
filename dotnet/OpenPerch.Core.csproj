@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>OpenPerch.Core</AssemblyName>
+    <RootNamespace>OpenPerch</RootNamespace>
+    <!-- Sources live in the Unity trees; only the noEngineReferences assemblies are compiled here. -->
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../app/Assets/OpenPerch/Core/**/*.cs" />
+    <Compile Include="../packages/com.openperch.runtime/Format/**/*.cs" />
+    <Compile Include="../app/Assets/OpenPerch/Platform.Windows.Native/**/*.cs" />
+  </ItemGroup>
+
+</Project>

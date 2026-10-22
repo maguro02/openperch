@@ -1,0 +1,28 @@
+{
+  "name": "OpenPerch.App.Boot",
+  "rootNamespace": "OpenPerch.App.Boot",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Format",
+    "OpenPerch.Format.Json",
+    "OpenPerch.Runtime",
+    "OpenPerch.App.Platform.Windows.Native",
+    "OpenPerch.App.Platform.Windows",
+    "OpenPerch.App.Loading",
+    "OpenPerch.App.Rendering",
+    "OpenPerch.App.Animation",
+    "OpenPerch.App.Dynamics",
+    "OpenPerch.App.Mascot",
+    "OpenPerch.App.UI",
+    "UniTask"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

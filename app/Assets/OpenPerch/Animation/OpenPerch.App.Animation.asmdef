@@ -1,0 +1,17 @@
+{
+  "name": "OpenPerch.App.Animation",
+  "rootNamespace": "OpenPerch.App.Animation",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

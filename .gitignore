@@ -1,0 +1,49 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# Unity projects: app/ and fixtures/<project>/
+/app/[Ll]ibrary/
+/app/[Tt]emp/
+/app/[Oo]bj/
+/app/[Bb]uild/
+/app/[Bb]uilds/
+/app/[Ll]ogs/
+/app/[Uu]ser[Ss]ettings/
+/app/[Mm]emoryCaptures/
+/app/*.csproj
+/app/*.sln
+/app/.vsconfig
+/fixtures/*/[Ll]ibrary/
+/fixtures/*/[Tt]emp/
+/fixtures/*/[Oo]bj/
+/fixtures/*/[Bb]uild/
+/fixtures/*/[Bb]uilds/
+/fixtures/*/[Ll]ogs/
+/fixtures/*/[Uu]ser[Ss]ettings/
+/fixtures/*/[Mm]emoryCaptures/
+/fixtures/*/*.csproj
+/fixtures/*/*.sln
+/fixtures/*/.vsconfig
+**/OpenPerchExports/
+**/Assets/__OpenPerchExport/
+**/Assets/__OpenPerchExport.meta
+sysinfo.txt
+
+# .NET
+/dotnet/bin/
+/dotnet/obj/
+/dotnet/*/bin/
+/dotnet/*/obj/
+*.user
+TestResults/
+
+# Build output
+/out/
+
+# Private material (never published)
+legal/

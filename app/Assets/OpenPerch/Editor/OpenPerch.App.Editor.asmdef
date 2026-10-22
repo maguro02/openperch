@@ -1,0 +1,21 @@
+{
+  "name": "OpenPerch.App.Editor",
+  "rootNamespace": "OpenPerch.App.Editor",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Format",
+    "OpenPerch.Runtime",
+    "OpenPerch.App.Boot"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

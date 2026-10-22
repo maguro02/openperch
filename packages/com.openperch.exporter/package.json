@@ -1,0 +1,16 @@
+{
+  "name": "com.openperch.exporter",
+  "displayName": "OpenPerch Exporter",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Exports your own avatar and motions from a Unity project into .opk files for the OpenPerch desktop app.",
+  "license": "MIT",
+  "author": {
+    "name": "Yuto Sugiura",
+    "url": "https://github.com/maguro02"
+  },
+  "url": "https://github.com/maguro02/openperch",
+  "vpmDependencies": {
+    "com.openperch.runtime": "0.1.0"
+  }
+}

@@ -1,0 +1,4 @@
+<linker>
+  <!-- Bundles are built after the player, so the linker cannot see which runtime types they reference. -->
+  <assembly fullname="OpenPerch.Runtime" preserve="all" />
+</linker>

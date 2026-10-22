@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <!-- Shared sources are also compiled by Unity 2022.3, whose C# compiler stops at C# 9. -->
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+</Project>

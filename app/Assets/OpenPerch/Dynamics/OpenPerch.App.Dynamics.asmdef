@@ -1,0 +1,25 @@
+{
+  "name": "OpenPerch.App.Dynamics",
+  "rootNamespace": "OpenPerch.App.Dynamics",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Runtime",
+    "Unity.Mathematics",
+    "Unity.Burst"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.unity.burst",
+      "expression": "1.8.0",
+      "define": "OP_BURST"
+    }
+  ],
+  "noEngineReferences": false
+}

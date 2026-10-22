@@ -1,0 +1,35 @@
+{
+  "name": "OpenPerch.App.Tests.PlayMode",
+  "rootNamespace": "OpenPerch.App.Tests.PlayMode",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Format",
+    "OpenPerch.Format.Json",
+    "OpenPerch.Runtime",
+    "OpenPerch.App.Platform.Windows.Native",
+    "OpenPerch.App.Platform.Windows",
+    "OpenPerch.App.Loading",
+    "OpenPerch.App.Rendering",
+    "OpenPerch.App.Animation",
+    "OpenPerch.App.Dynamics",
+    "OpenPerch.App.Mascot",
+    "OpenPerch.App.UI",
+    "OpenPerch.App.Boot",
+    "OpenPerch.App.Tests.Shared",
+    "UniTask",
+    "UnityEngine.TestRunner"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

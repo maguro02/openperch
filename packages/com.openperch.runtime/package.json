@@ -1,0 +1,13 @@
+{
+  "name": "com.openperch.runtime",
+  "displayName": "OpenPerch Runtime",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Serialization contract and .opk package format shared by the OpenPerch exporter and app.",
+  "license": "MIT",
+  "author": {
+    "name": "Yuto Sugiura",
+    "url": "https://github.com/maguro02"
+  },
+  "url": "https://github.com/maguro02/openperch"
+}

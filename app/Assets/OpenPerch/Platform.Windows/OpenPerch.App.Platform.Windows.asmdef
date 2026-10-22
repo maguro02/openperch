@@ -1,0 +1,17 @@
+{
+  "name": "OpenPerch.App.Platform.Windows",
+  "rootNamespace": "OpenPerch.App.Platform.Windows",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.App.Platform.Windows.Native"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

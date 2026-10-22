@@ -1,0 +1,23 @@
+{
+  "name": "OpenPerch.App.DevTools",
+  "rootNamespace": "OpenPerch.App.DevTools",
+  "references": [
+    "OpenPerch.App.Core",
+    "OpenPerch.Format",
+    "OpenPerch.Format.Json",
+    "OpenPerch.Runtime",
+    "OpenPerch.App.Loading",
+    "OpenPerch.App.Mascot",
+    "OpenPerch.App.Boot",
+    "UniTask"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
