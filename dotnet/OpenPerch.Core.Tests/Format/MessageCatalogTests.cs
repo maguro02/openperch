@@ -17,29 +17,59 @@ namespace OpenPerch.Core.Tests.Format
         private static readonly Regex CodeHeading = new Regex(@"^#{1,6}[ \t]+([EWI]_[A-Z0-9_]+)[ \t]*$");
         private static readonly Regex AnyHeading = new Regex(@"^#{1,6}[ \t]");
         private static readonly Regex CodeShape = new Regex(@"^[EWI]_[A-Z0-9]+(?:_[A-Z0-9]+)*$");
+        private static readonly Regex UnityVersionText = new Regex(@"\d{4}\.\d+\.\d+[abfp]\d+");
+        private static readonly Regex UnityRangeText = new Regex(@"\d{4}\.\d+\.\d+[abfp]\d+〜\d{4}\.\d+\.\d+[abfp]\d+");
+
+        /// <summary>The troubleshooting sections that tell the user which Unity versions to export with.</summary>
+        private static readonly string[] CodesNamingTheExporterUnity =
+        {
+            MessageCodes.E_EXPORT_UNSUPPORTED_UNITY, MessageCodes.W_EXPORT_UNITY6_APP_ONLY,
+            MessageCodes.E_COMPAT_DIFFERENT_STREAM, MessageCodes.E_COMPAT_NEWER_THAN_APP,
+        };
 
         private static string[] DocLines() => File.ReadAllLines(RepoPaths.Combine(MessageCatalog.TroubleshootingPath.Split('/')));
 
-        /// <summary>Code headings in the troubleshooting document, with the text of their sections.</summary>
-        private static List<KeyValuePair<string, string>> DocSections()
+        /// <summary>Every heading line of a Markdown document with the text up to the next heading.</summary>
+        private static List<KeyValuePair<string, string>> Sections(string[] lines)
         {
             var sections = new List<KeyValuePair<string, string>>();
-            string code = null;
+            string heading = null;
             var body = new StringBuilder();
-            foreach (string line in DocLines())
+            foreach (string line in lines)
             {
                 if (AnyHeading.IsMatch(line))
                 {
-                    if (code != null) sections.Add(new KeyValuePair<string, string>(code, body.ToString()));
-                    Match m = CodeHeading.Match(line);
-                    code = m.Success ? m.Groups[1].Value : null;
+                    if (heading != null) sections.Add(new KeyValuePair<string, string>(heading, body.ToString()));
+                    heading = line;
                     body.Clear();
                     continue;
                 }
                 body.AppendLine(line);
             }
-            if (code != null) sections.Add(new KeyValuePair<string, string>(code, body.ToString()));
+            if (heading != null) sections.Add(new KeyValuePair<string, string>(heading, body.ToString()));
             return sections;
+        }
+
+        /// <summary>Code headings in the troubleshooting document, with the text of their sections.</summary>
+        private static List<KeyValuePair<string, string>> DocSections()
+        {
+            var sections = new List<KeyValuePair<string, string>>();
+            foreach (KeyValuePair<string, string> section in Sections(DocLines()))
+            {
+                Match m = CodeHeading.Match(section.Key);
+                if (m.Success) sections.Add(new KeyValuePair<string, string>(m.Groups[1].Value, section.Value));
+            }
+            return sections;
+        }
+
+        private static void AssertNamesOnlyThePolicyBounds(string text, string where)
+        {
+            Assert.That(text, Does.Contain(ExporterUnityPolicy.MinUnity2022), where);
+            Assert.That(text, Does.Contain(ExporterUnityPolicy.MaxAppUnity2022), where);
+            foreach (Match version in UnityVersionText.Matches(text))
+            {
+                Assert.That(version.Value, Is.EqualTo(ExporterUnityPolicy.MinUnity2022).Or.EqualTo(ExporterUnityPolicy.MaxAppUnity2022), where);
+            }
         }
 
         // GitHub's rule for heading anchors: lowercase, drop punctuation other than "-" and "_", spaces become "-".
@@ -73,6 +103,53 @@ namespace OpenPerch.Core.Tests.Format
             {
                 Assert.That(MessageCatalog.TryGet(section.Key, out _), Is.True, section.Key + " is documented but not in the catalog");
             }
+        }
+
+        [Test]
+        public void EverySectionOpensWithTheJapaneseMessage()
+        {
+            foreach (KeyValuePair<string, string> section in DocSections())
+            {
+                Assert.That(MessageCatalog.TryGet(section.Key, out MessageDef def), Is.True, section.Key);
+                string opening = section.Value.Split('\n').Select(l => l.Trim()).FirstOrDefault(l => l.Length > 0);
+                Assert.That(opening, Is.EqualTo(def.Ja), section.Key);
+            }
+        }
+
+        [Test]
+        public void UnsupportedUnityMessageNamesThePolicyBounds()
+        {
+            Assert.That(MessageCatalog.TryGet(MessageCodes.E_EXPORT_UNSUPPORTED_UNITY, out MessageDef def), Is.True);
+
+            AssertNamesOnlyThePolicyBounds(def.Ja, "Ja");
+            AssertNamesOnlyThePolicyBounds(def.En, "En");
+        }
+
+        [Test]
+        public void TroubleshootingNamesThePolicyBoundsForTheExporterUnity()
+        {
+            string expectedRange = ExporterUnityPolicy.MinUnity2022 + "〜" + ExporterUnityPolicy.MaxAppUnity2022;
+            MatchCollection ranges = UnityRangeText.Matches(string.Join("\n", DocLines()));
+            Assert.That(ranges.Count, Is.GreaterThan(0));
+            foreach (Match range in ranges)
+            {
+                Assert.That(range.Value, Is.EqualTo(expectedRange));
+            }
+
+            Dictionary<string, string> sections = DocSections().ToDictionary(s => s.Key, s => s.Value);
+            foreach (string code in CodesNamingTheExporterUnity)
+            {
+                AssertNamesOnlyThePolicyBounds(sections[code], code);
+            }
+        }
+
+        [Test]
+        public void FormatSpecNamesThePolicyBoundsForTheExporterUnity()
+        {
+            KeyValuePair<string, string> policySection = Sections(File.ReadAllLines(RepoPaths.Combine("docs", "format-spec.md")))
+                .Single(s => s.Value.Contains("`ExporterUnityPolicy`"));
+
+            AssertNamesOnlyThePolicyBounds(policySection.Value, policySection.Key);
         }
 
         [Test]

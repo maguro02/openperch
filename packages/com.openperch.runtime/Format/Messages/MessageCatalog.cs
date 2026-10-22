@@ -25,8 +25,8 @@ namespace OpenPerch.Format
                 "許容範囲外の値を範囲内に収めました。揺れ方や見た目が書き出し元と異なることがあります。",
                 "Out-of-range values were clamped. Motion or appearance may differ from the original."),
             Warning(MessageCodes.W_REF_OUTSIDE,
-                "アバターの外を指す参照を外しました。該当する揺れものや Constraint は動きません。",
-                "References pointing outside the avatar were removed. The affected PhysBones and constraints do not move."),
+                "アバターの外を指す参照を外しました。根元や対象を失った揺れもの・Constraint は動きません。",
+                "References pointing outside the avatar were removed. PhysBones and constraints that lost their root or target do not move."),
             Warning(MessageCodes.W_THUMB_REJECTED,
                 "サムネイルが条件を満たさないため、表示しません。",
                 "The thumbnail does not meet the requirements and is not shown."),
@@ -184,15 +184,20 @@ namespace OpenPerch.Format
                 "Unity 6 で書き出したファイルは、Unity 6 版のアプリでのみ読めます。",
                 "Files exported with Unity 6 can only be read by the Unity 6 build of the app."),
             Error(MessageCodes.E_EXPORT_UNSUPPORTED_UNITY,
-                "この Unity のバージョンでは書き出せません。Unity 2022.3.22f1〜2022.3.62f3 で書き出してください。",
-                "This Unity version cannot export. Use Unity 2022.3.22f1 to 2022.3.62f3."),
+                "この Unity のバージョンでは書き出せません。Unity " + ExporterUnityPolicy.MinUnity2022 + "〜" +
+                ExporterUnityPolicy.MaxAppUnity2022 + " で書き出してください。",
+                "This Unity version cannot export. Use Unity " + ExporterUnityPolicy.MinUnity2022 + " to " +
+                ExporterUnityPolicy.MaxAppUnity2022 + "."),
         };
 
         private static readonly ReadOnlyCollection<MessageDef> AllDefs = Array.AsReadOnly(Defs);
         private static readonly Dictionary<string, MessageDef> ByCode = Index(Defs);
 
+        /// <summary>Every message; no code appears twice.</summary>
         public static IReadOnlyList<MessageDef> All => AllDefs;
 
+        /// <summary>Looks up a code by exact, case-sensitive match.</summary>
+        /// <returns>False, with <paramref name="def"/> null, when <paramref name="code"/> is null or not in the catalog.</returns>
         public static bool TryGet(string code, out MessageDef def)
         {
             if (code == null)
