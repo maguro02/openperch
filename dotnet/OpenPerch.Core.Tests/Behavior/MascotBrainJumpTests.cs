@@ -43,6 +43,33 @@ namespace OpenPerch.Core.Tests.Behavior
             Assert.That(landed.FeetPx.y, Is.EqualTo(740f));
         }
 
+        // The limits for a 360 px tall avatar are a rise of 540, a run of 900 and 360 px of headroom, all included.
+        [TestCase(540, 900, 360, true)]
+        [TestCase(541, 900, 360, false)]
+        [TestCase(540, 901, 360, false)]
+        [TestCase(540, 900, 359, false)]
+        public void JumpLimitsIncludeTheirBounds(int rise, int run, int headroom, bool jumps)
+        {
+            int y = 1040 - rise;
+            int landingX = 700 + run;
+            BrainHarness h = Scene(0.5f, TestDesk.Window(8, y, landingX - 1, landingX + 199, headroom));
+
+            BrainOutput decided = h.Steps(30);
+
+            if (!jumps)
+            {
+                Assert.That(decided.State, Is.EqualTo(MascotState.Idle));
+                AssertNeverJumps(h, 120);
+                return;
+            }
+
+            Assert.That(decided.State, Is.EqualTo(MascotState.Jump));
+            BrainOutput landed = h.StepUntil(o => o.State != MascotState.Jump);
+            Assert.That(landed.State, Is.EqualTo(MascotState.Landing));
+            Assert.That(landed.FeetPx.x, Is.EqualTo((float)landingX).Within(0.01f));
+            Assert.That(landed.FeetPx.y, Is.EqualTo((float)y));
+        }
+
         // Weights 1 and 1/2: draws below 2/3 pick the window straight above.
         [TestCase(0.6f, 700f, 740f)]
         [TestCase(0.7f, 1060f, 840f)]

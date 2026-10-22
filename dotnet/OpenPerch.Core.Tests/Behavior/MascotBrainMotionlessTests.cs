@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using OpenPerch.App.Core;
@@ -7,35 +8,40 @@ namespace OpenPerch.Core.Tests.Behavior
     [Category("T-BRAIN")]
     public class MascotBrainMotionlessTests
     {
+        // With the default weights these draws pick walk, sit, idle, the idle variant and jump.
+        private static readonly float[] OneDrawPerAction = { 0.1f, 0.33f, 0.77f, 0.867f, 0.99f };
+
         [Test]
         public void OnlyIdleDraggedAndFallingOccurWithoutMotions()
         {
             var h = new BrainHarness(
-                new BehaviorConfig(),
+                TestDesk.FixedDwell(1f),
                 TestDesk.Desk(TestDesk.Window(101, 600, 400, 1000), TestDesk.Window(102, 840, 1200, 1700)),
                 new Vec2(960f, 1040f),
                 MotionAvailability.None,
-                Draws(97));
+                OneDrawPerAction);
             var states = new HashSet<MascotState>();
             var roles = new HashSet<LocomotionRole>();
+            var actionDraws = new HashSet<float>();
 
             for (int k = 0; k < 5400; k++)
             {
                 if (k % 300 == 100)
                 {
-                    Record(h.Press(new Vec2(h.Input.FeetPx.x, h.Input.FeetPx.y - 200f)), states, roles);
+                    Record(h, () => h.Press(new Vec2(h.Input.FeetPx.x, h.Input.FeetPx.y - 200f)), states, roles, actionDraws);
                     for (int held = 0; held < 9; held++)
                     {
-                        Record(h.Step(), states, roles);
+                        Record(h, h.Step, states, roles, actionDraws);
                     }
 
-                    Record(h.Release(new Vec2(500f, -800f)), states, roles);
+                    Record(h, () => h.Release(new Vec2(500f, -800f)), states, roles, actionDraws);
                     continue;
                 }
 
-                Record(h.Step(), states, roles);
+                Record(h, h.Step, states, roles, actionDraws);
             }
 
+            Assert.That(actionDraws, Is.EquivalentTo(OneDrawPerAction));
             Assert.That(states, Is.SubsetOf(new[] { MascotState.Idle, MascotState.Dragged, MascotState.Falling }));
             Assert.That(states, Does.Contain(MascotState.Dragged).And.Contain(MascotState.Falling));
             Assert.That(roles, Is.EquivalentTo(new[] { LocomotionRole.Idle }));
@@ -76,24 +82,20 @@ namespace OpenPerch.Core.Tests.Behavior
             Assert.That(decided.Role, Is.EqualTo(LocomotionRole.Idle));
         }
 
-        private static void Record(BrainOutput o, HashSet<MascotState> states, HashSet<LocomotionRole> roles)
+        private static void Record(
+            BrainHarness h, Func<BrainOutput> tick, HashSet<MascotState> states, HashSet<LocomotionRole> roles, HashSet<float> actionDraws)
         {
-            states.Add(o.State);
-            roles.Add(o.Role);
-        }
+            int before = h.Random.Calls;
+            BrainOutput o = tick();
 
-        /// <summary>A fixed pseudo-random sequence in [0, 1), so the long run is reproducible.</summary>
-        private static float[] Draws(int count)
-        {
-            var values = new float[count];
-            long x = 12345;
-            for (int k = 0; k < count; k++)
+            // Without motions a decision draws the action and then the next idle time; a landing draws the idle time only.
+            if (h.Random.Calls - before == 2)
             {
-                x = (1103515245L * x + 12345L) % 2147483648L;
-                values[k] = (x % 10000L) / 10000f;
+                actionDraws.Add(OneDrawPerAction[before % OneDrawPerAction.Length]);
             }
 
-            return values;
+            states.Add(o.State);
+            roles.Add(o.Role);
         }
     }
 }
