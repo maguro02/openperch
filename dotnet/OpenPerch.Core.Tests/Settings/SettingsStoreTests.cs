@@ -366,6 +366,40 @@ namespace OpenPerch.Core.Tests.Settings
         }
 
         [Test]
+        public void FileFromANewerBuildIsCopiedAside()
+        {
+            const string newer = "{\"schemaVersion\": 2, \"targetFpsCap\": 30, \"addedByANewerBuild\": true}";
+            File.WriteAllText(SettingsPath, newer);
+
+            var loaded = NewStore().Load();
+
+            Assert.That(loaded.schemaVersion, Is.EqualTo(1));
+            Assert.That(loaded.targetFpsCap, Is.EqualTo(30));
+            Assert.That(File.ReadAllText(SettingsPath), Is.EqualTo(newer));
+            Assert.That(File.ReadAllText(_dir.Combine(BackupName)), Is.EqualTo(newer));
+        }
+
+        [TestCase("{\"schemaVersion\": 0}")]
+        [TestCase("{\"schemaVersion\": 1}")]
+        public void OlderOrCurrentFileIsNotCopied(string text)
+        {
+            File.WriteAllText(SettingsPath, text);
+
+            NewStore().Load();
+
+            Assert.That(Directory.GetFileSystemEntries(_dir.Root), Is.EqualTo(new[] { SettingsPath }));
+        }
+
+        [Test]
+        public void NewerFileThatCannotBeCopiedStillLoads()
+        {
+            File.WriteAllText(SettingsPath, "{\"schemaVersion\": 2, \"targetFpsCap\": 30}");
+            Directory.CreateDirectory(_dir.Combine(BackupName));
+
+            Assert.That(NewStore().Load().targetFpsCap, Is.EqualTo(30));
+        }
+
+        [Test]
         public void LoadedSettingsAreNormalized()
         {
             File.WriteAllText(SettingsPath, "{\"targetFpsCap\": 100000, \"notify\": null, \"language\": null}");

@@ -50,6 +50,23 @@ namespace OpenPerch.App.Core
         }
 
         /// <summary>
+        /// Copies <paramref name="path"/> to the same name <see cref="TryMoveAside"/> would move it to. Returns false when the
+        /// copy fails with an error <see cref="IsFileError"/> accepts.
+        /// </summary>
+        public static bool TryCopyAside(string path, DateTime utcNow)
+        {
+            try
+            {
+                File.Copy(path, BackupPath(path, utcNow));
+                return true;
+            }
+            catch (Exception e) when (IsFileError(e))
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// True for the exceptions a file operation throws when the disk, the permissions or another process get in the way,
         /// as opposed to a bug in the caller.
         /// </summary>

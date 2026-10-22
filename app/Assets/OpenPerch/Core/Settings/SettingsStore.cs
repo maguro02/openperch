@@ -38,7 +38,9 @@ namespace OpenPerch.App.Core
         /// <summary>
         /// Reads the settings and passes them through <see cref="SettingsNormalizer"/>. A missing file yields the defaults.
         /// A file the codec cannot parse is moved to <c>settings.json.bak-&lt;UTC time&gt;</c> and the defaults are returned;
-        /// when it cannot be moved it stays in place until the next save replaces it.
+        /// when it cannot be moved it stays in place until the next save replaces it. A file written by a newer build, whose
+        /// <see cref="AppSettings.schemaVersion"/> is above <see cref="SettingsNormalizer.CurrentSchemaVersion"/>, is first
+        /// copied to the same kind of name, because saving the returned settings drops the fields only that build knows.
         /// </summary>
         /// <exception cref="IOException">
         /// The file exists but cannot be read, for example while another process holds it open without sharing. The defaults
@@ -72,6 +74,10 @@ namespace OpenPerch.App.Core
                 return SettingsNormalizer.Normalize(new AppSettings());
             }
 
+            if (loaded != null && loaded.schemaVersion > SettingsNormalizer.CurrentSchemaVersion)
+            {
+                PersistedFile.TryCopyAside(_path, _time.UtcNow);
+            }
             return SettingsNormalizer.Normalize(loaded);
         }
 

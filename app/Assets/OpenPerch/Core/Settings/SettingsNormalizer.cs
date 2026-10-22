@@ -13,7 +13,13 @@ namespace OpenPerch.App.Core
         /// <summary>The <see cref="AppSettings.schemaVersion"/> this build reads and writes.</summary>
         public const int CurrentSchemaVersion = 1;
 
-        /// <summary>Normalizes <paramref name="s"/> in place and returns it, or returns new defaults when it is null.</summary>
+        /// <summary>
+        /// Normalizes <paramref name="s"/> in place and returns it, or returns new defaults when it is null. A
+        /// <see cref="AppSettings.schemaVersion"/> above <see cref="CurrentSchemaVersion"/>, written by a newer build, is
+        /// lowered to <see cref="CurrentSchemaVersion"/> as well: the fields only that build knows are already gone, so once
+        /// these settings are saved the newer build's values are lost. <see cref="SettingsStore.Load"/> copies such a file
+        /// aside before it calls this method.
+        /// </summary>
         public static AppSettings Normalize(AppSettings s)
         {
             if (s == null) return new AppSettings();
@@ -41,9 +47,9 @@ namespace OpenPerch.App.Core
 
         private static void Migrate(AppSettings s)
         {
-            // Version 0 has the same fields as version 1, so migrating it only changes the number. A file from a newer
-            // build is written back as the current version: the codec has already dropped the fields this build does not
-            // know, and the newer build then migrates the file again instead of trusting a version it no longer matches.
+            // Version 0 has the same fields as version 1, so migrating it only changes the number. A newer version is
+            // lowered too, so that when the newer build reads the file again it migrates it instead of trusting a version
+            // whose fields are no longer all there.
             s.schemaVersion = CurrentSchemaVersion;
         }
 
